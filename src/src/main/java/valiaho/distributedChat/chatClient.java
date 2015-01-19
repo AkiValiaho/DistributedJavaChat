@@ -1,18 +1,19 @@
+package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 /**
  * Yksinkertainen chatclienttiohjelma 
  * multithreadaavalle sokettiserverille.
- * @author Aki Väliaho
+ * @author Aki Vï¿½liaho
  *
  */
 public class chatClient {
 	/**
 	 * Clienttiohjelman konstruktori, joka
-	 * pyöräyttää ohjelman käyntiin 
-	 * @param passedHostName mihin osoitteeseen yhdistetään
-	 * @param passedPortNumber mihin porttiin yhdistetään
+	 * pyï¿½rï¿½yttï¿½ï¿½ ohjelman kï¿½yntiin 
+	 * @param passedHostName mihin osoitteeseen yhdistetï¿½ï¿½n
+	 * @param passedPortNumber mihin porttiin yhdistetï¿½ï¿½n
 	 * @throws IOException
 	 */
 	public chatClient(String passedHostName, int passedPortNumber) throws IOException {
@@ -24,8 +25,8 @@ public class chatClient {
 		UUID userID = UUID.randomUUID();
 		chatClientReaderThread readerThread = new chatClientReaderThread(input,userID);
 		readerThread.start();
-		//Alustan skannerin jo tässä ylimääräisen threadin sijaan, koska scanneri jättää
-		//clientin päälle jos serveri päättää kaatua. Mielestäni reilumpaa, että asiakas ehtii nähdä viestit, jotka ehdittiin lähettää
+		//Alustan skannerin jo tï¿½ssï¿½ ylimï¿½ï¿½rï¿½isen threadin sijaan, koska scanneri jï¿½ttï¿½ï¿½
+		//clientin pï¿½ï¿½lle jos serveri pï¿½ï¿½ttï¿½ï¿½ kaatua. Mielestï¿½ni reilumpaa, ettï¿½ asiakas ehtii nï¿½hdï¿½ viestit, jotka ehdittiin lï¿½hettï¿½ï¿½
 		//ennen serverin kaatumista.
 		Scanner stringScanner = new Scanner(System.in);
 		while (readerThread.isAlive()) {
@@ -38,12 +39,12 @@ public class chatClient {
 				}
 				if (string.equals("LOPETA")) {
 					viestiOlio = new Viesti(string, InetAddress.getLocalHost().getHostAddress(),userID);
-					//Tallennetaan disconnect-käsky olioon
+					//Tallennetaan disconnect-kï¿½sky olioon
 					viestiOlio.setDisconnect(true);
-					//Kirjoitetaan disconnect-käskyn sisältävä olio sokettiin
+					//Kirjoitetaan disconnect-kï¿½skyn sisï¿½ltï¿½vï¿½ olio sokettiin
 					output.writeObject(viestiOlio);
 					try {
-						//Ja suljetaan ylimääräiset jutut pois
+						//Ja suljetaan ylimï¿½ï¿½rï¿½iset jutut pois
 						readerThread.join();
 						clientSideSocket.close();
 						input.close();
@@ -57,20 +58,5 @@ public class chatClient {
 				output.writeObject(viestiOlio);
 			}
 		}
-	}
-	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
-		String hostName;
-		int portNumber;
-		if (args.length !=2 ) {
-			//Käytetään tehtävässä annettua default-porttia ja localhostia
-			hostName = "localhost";
-			portNumber = 12345;
-		} else {
-			//Muuten mennään argumenteilla
-			hostName = args[0];
-			portNumber = Integer.parseInt(args[1]);
-		}
-		//Käynnistetään konstruktorilla serveri
-		chatClient client = new chatClient(hostName,portNumber);
 	}
 }

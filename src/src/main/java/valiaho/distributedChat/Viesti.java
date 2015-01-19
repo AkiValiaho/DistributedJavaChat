@@ -1,9 +1,10 @@
+package valiaho.distributedChat;
 import java.io.*;
 import java.util.*;
 /**
- * Viesti-olio kapsuloi lähettäjän IP-osoitteen ja lähetetyn viestin sarjallistettavaksi
- * luokaksi, jonka olioita voidaan lähetellä ObjectOutputStreamin kautta soketteihin.
- * @author Aki Väliaho
+ * Viesti-olio kapsuloi lï¿½hettï¿½jï¿½n IP-osoitteen ja lï¿½hetetyn viestin sarjallistettavaksi
+ * luokaksi, jonka olioita voidaan lï¿½hetellï¿½ ObjectOutputStreamin kautta soketteihin.
+ * @author Aki Vï¿½liaho
  *
  */
 public class Viesti implements Serializable{
@@ -15,9 +16,9 @@ public class Viesti implements Serializable{
 	private Boolean yllapitajan = false;
 	/**
 	 * Konstuktori luokalle
-	 * @param viesti Viestin sisältö
-	 * @param ip Lähettäjän IP-osoite
-	 * @param userID2 Lähettäjän uniikki UIID
+	 * @param viesti Viestin sisï¿½ltï¿½
+	 * @param ip Lï¿½hettï¿½jï¿½n IP-osoite
+	 * @param userID2 Lï¿½hettï¿½jï¿½n uniikki UIID
 	 */
 	public Viesti(String viesti, String ip, UUID userID2) {
 		this.setIp(ip);
@@ -27,19 +28,19 @@ public class Viesti implements Serializable{
 	public Viesti() {
 	}
 	/**
-	 * Korvaa oletusarvoisen writeObjectin lisäämällä päälle yksinkertaisen salakirjoituslayerin
+	 * Korvaa oletusarvoisen writeObjectin lisï¿½ï¿½mï¿½llï¿½ pï¿½ï¿½lle yksinkertaisen salakirjoituslayerin
 	 * @param out Mihin kirjoitetaan
 	 * @throws IOException
 	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
-		//"Encryptataan" tiedot Caesarilla, että ei aivan suoraan saa napsittua serializable-esitystä verkosta
-		//Tässä voisi käyttää jotakin hienompaakin suhteellisen helposti. Lähettäisi vaikka privaattikeyt jonkun
-		//turvallisemman verkkoprotokollan kautta serveriltä clientille ja purkaisi sitten tässä oliossa käyttäen tuota
-		//keytä (tuhoten avaimen tietysti oliosta ennen eteenpäin lähettämistä).
-		//Helpompi tapa olisi käyttää tietysti jotakin valmislibraryä objektin signaamiseen ja sealaamiseen. API:sta löytyy itseasiassa
-		//kaksi hyödyllistä luokkaa: https://docs.oracle.com/javase/7/docs/api/java/security/SignedObject.html ja
-		//https://docs.oracle.com/javase/7/docs/api/javax/crypto/SealedObject.html joilla voisi tällaisen wrapperin helposti kehitellä
-		//ja täten välttyisi näiden writeObjektin ja readObjektin kirjoittamiselta.
+		//"Encryptataan" tiedot Caesarilla, ettï¿½ ei aivan suoraan saa napsittua serializable-esitystï¿½ verkosta
+		//Tï¿½ssï¿½ voisi kï¿½yttï¿½ï¿½ jotakin hienompaakin suhteellisen helposti. Lï¿½hettï¿½isi vaikka privaattikeyt jonkun
+		//turvallisemman verkkoprotokollan kautta serveriltï¿½ clientille ja purkaisi sitten tï¿½ssï¿½ oliossa kï¿½yttï¿½en tuota
+		//keytï¿½ (tuhoten avaimen tietysti oliosta ennen eteenpï¿½in lï¿½hettï¿½mistï¿½).
+		//Helpompi tapa olisi kï¿½yttï¿½ï¿½ tietysti jotakin valmislibraryï¿½ objektin signaamiseen ja sealaamiseen. API:sta lï¿½ytyy itseasiassa
+		//kaksi hyï¿½dyllistï¿½ luokkaa: https://docs.oracle.com/javase/7/docs/api/java/security/SignedObject.html ja
+		//https://docs.oracle.com/javase/7/docs/api/javax/crypto/SealedObject.html joilla voisi tï¿½llaisen wrapperin helposti kehitellï¿½
+		//ja tï¿½ten vï¿½lttyisi nï¿½iden writeObjektin ja readObjektin kirjoittamiselta.
 		if (getKryptattu()) {
 			//On jo kryptattu, sarjallistetaan
 			out.defaultWriteObject();
@@ -59,7 +60,7 @@ public class Viesti implements Serializable{
 			    stringBuilder.append(',');
 			}
 			setViesti(stringBuilder.toString());
-			//Asetetaan tieto, että objektin fieldit on nyt 'salakirjoitettu'
+			//Asetetaan tieto, ettï¿½ objektin fieldit on nyt 'salakirjoitettu'
 			setKryptattu(true);
 			out.defaultWriteObject();
 			//Kirjoitetaan ulos defaultilla
@@ -67,12 +68,12 @@ public class Viesti implements Serializable{
 		}
 	/**
 	 * Puretaan sarjallistus
-	 * @param in Mitä kuunnellaan
+	 * @param in Mitï¿½ kuunnellaan
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
 	private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
-	//Ja käännetään koko homma takaisin ykkös-Caesarista
+	//Ja kï¿½ï¿½nnetï¿½ï¿½n koko homma takaisin ykkï¿½s-Caesarista
 		in.defaultReadObject();
 		StringBuilder stringBuilder = new StringBuilder();
 		List<String> ipArray =Arrays.asList(getIp().split(","));
@@ -86,7 +87,7 @@ public class Viesti implements Serializable{
 			  stringBuilder.append((char)(Integer.parseInt(string)-1));
 		}
 		setViesti(stringBuilder.toString());
-		//Asetetaan tieto, että objektin fieldit on purettu
+		//Asetetaan tieto, ettï¿½ objektin fieldit on purettu
 		setKryptattu(false);
 	}
 	public String getIp() {

@@ -1,8 +1,9 @@
+package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 /**
- * Clienttiohjelman sokettiin tulevaa syötettä lukeva threadi
+ * Clienttiohjelman sokettiin tulevaa syï¿½tettï¿½ lukeva threadi
  * @author Aki
  *
  */
@@ -12,8 +13,8 @@ public class chatClientReaderThread extends Thread{
 	private Boolean kuuntelee = true;
 	/**
 	 * Konstruktori luokalle
-	 * @param input Mitä kuunnellaan?
-	 * @param userID Käyttäjälle luotu ID
+	 * @param input Mitï¿½ kuunnellaan?
+	 * @param userID Kï¿½yttï¿½jï¿½lle luotu ID
 	 * @throws IOException
 	 */
 	public chatClientReaderThread(ObjectInputStream input, UUID userID) throws IOException {
@@ -29,28 +30,28 @@ public class chatClientReaderThread extends Thread{
 				String viesti = viestiIn.getViesti();
 				if (viestiIn.getYllapitajan()) {
 					if (viestiIn.getDisconnect()) {
-						//Ylläpitäjä haluaa sulkea palvelimen
-						System.out.println("Ylläpitäjä on sammuttanut palvelimen, paina enter lopettaaksesi");
+						//Yllï¿½pitï¿½jï¿½ haluaa sulkea palvelimen
+						System.out.println("Yllï¿½pitï¿½jï¿½ on sammuttanut palvelimen, paina enter lopettaaksesi");
 						break;
 					} else {
-						//Ylläpitäjä haluaa sanoa jotain
-						System.out.println("Ylläpitäjä sanoo: "+viesti);
+						//Yllï¿½pitï¿½jï¿½ haluaa sanoa jotain
+						System.out.println("Yllï¿½pitï¿½jï¿½ sanoo: "+viesti);
 						continue;
 					}
 				}
-				//Tutkaillaan onko viesti-paketissa käsky lopettaa threadi
+				//Tutkaillaan onko viesti-paketissa kï¿½sky lopettaa threadi
 				if (viestiIn.getDisconnect()) {
 					break;
 				}
-				//Samoja viestejä on turha näyttää ne lähettäneelle käyttäjälle
-				//joten jäädään odottamaan seuraavaa viestiä
+				//Samoja viestejï¿½ on turha nï¿½yttï¿½ï¿½ ne lï¿½hettï¿½neelle kï¿½yttï¿½jï¿½lle
+				//joten jï¿½ï¿½dï¿½ï¿½n odottamaan seuraavaa viestiï¿½
 				if (viesti == null || userID.equals(viestiIn.getUserID())) {
 					continue;
 				}
 				System.out.println(viesti);
 			} catch (ClassNotFoundException | IOException e) {
-				//Jos palvelimelle sattuu jotakin epäilyttävää
-				System.out.println("Yhteys palvelimelle on katkennut yllättäen! Yritä myöhemmin uudelleen");
+				//Jos palvelimelle sattuu jotakin epï¿½ilyttï¿½vï¿½ï¿½
+				System.out.println("Yhteys palvelimelle on katkennut yllï¿½ttï¿½en! Yritï¿½ myï¿½hemmin uudelleen");
 				break;
 			}	
 		}
