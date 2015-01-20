@@ -1,9 +1,10 @@
+package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
 /**
  * Serverin jokaiselle clientille luoma threadi, joka tutkii asiakkaalta
- * tulevaa syötettä ja lähettää sen eteenpäin muille threadeille.
- * @author Aki Väliaho
+ * tulevaa syï¿½tettï¿½ ja lï¿½hettï¿½ï¿½ sen eteenpï¿½in muille threadeille.
+ * @author Aki Vï¿½liaho
  *
  */
 public class chatServerThread extends Thread {
@@ -13,8 +14,8 @@ public class chatServerThread extends Thread {
 	private chatServer chatServer;
 	/**
 	 * Konstruktori luokalle
-	 * @param accept Serverin hyväksymä soketti johon muodostettu yhteys passataan argumenttina
-	 * @param chatServer Serverin objekti, että päästään käsiksi listaan
+	 * @param accept Serverin hyvï¿½ksymï¿½ soketti johon muodostettu yhteys passataan argumenttina
+	 * @param chatServer Serverin objekti, ettï¿½ pï¿½ï¿½stï¿½ï¿½n kï¿½siksi listaan
 	 */
 	public chatServerThread(Socket accept, chatServer chatServer) {
 		try {
@@ -30,13 +31,13 @@ public class chatServerThread extends Thread {
 	public void run() {
 		while (true) {
 			try {
-				//Vastaanotetaan asiakkaalta tai serveriltä Viesti-objekti
+				//Vastaanotetaan asiakkaalta tai serveriltï¿½ Viesti-objekti
 				Viesti viesti = (Viesti)in.readObject();
 				if (viesti == null) {
 					continue;
 				}
 				if (viesti.getDisconnect() == true) {
-					//Lähetetään soketille takas tieto että valmis kaatumaan
+					//Lï¿½hetetï¿½ï¿½n soketille takas tieto ettï¿½ valmis kaatumaan
 					//Poistetaan instanssi listalta
 					chatServer.arrayOfClients.remove(this);
 					//Ilmoitetaan aiheesta
@@ -44,7 +45,7 @@ public class chatServerThread extends Thread {
 					out.writeObject(viesti);
 					break;
 				}
-				//Lähetetään asiakkaiden putkeen saapunut viesti
+				//Lï¿½hetetï¿½ï¿½n asiakkaiden putkeen saapunut viesti
 				//Ja tulostetaan palvelimelle viesti
 				System.out.println(viesti.getIp()+" "+":"+" "+viesti.getViesti());
 				for (chatServerThread thrad : chatServer.arrayOfClients) {
