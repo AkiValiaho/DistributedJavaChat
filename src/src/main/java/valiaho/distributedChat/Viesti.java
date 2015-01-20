@@ -45,27 +45,30 @@ public class Viesti implements Serializable{
 			//On jo kryptattu, sarjallistetaan
 			out.defaultWriteObject();
 		} else {
-			StringBuilder stringBuilder = new StringBuilder();
-			for (int i = 0; i < getIp().length(); i++){
-				char c = getIp().charAt(i);
-				stringBuilder.append((char)c+1);
-			    stringBuilder.append(',');
-			}
-			stringBuilder.append("");
-			setIp(stringBuilder.toString());
-			stringBuilder = new StringBuilder();
-			for (int i = 0; i < getViesti().length(); i++){
-			    char c = getViesti().charAt(i);
-			    stringBuilder.append((char)c+1);
-			    stringBuilder.append(',');
-			}
-			setViesti(stringBuilder.toString());
-			//Asetetaan tieto, ett� objektin fieldit on nyt 'salakirjoitettu'
-			setKryptattu(true);
-			out.defaultWriteObject();
-			//Kirjoitetaan ulos defaultilla
+			encrypt(out);
 		}
 		}
+	private void encrypt(ObjectOutputStream out) throws IOException {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (int i = 0; i < getIp().length(); i++){
+			char c = getIp().charAt(i);
+			stringBuilder.append((char)c+1);
+		    stringBuilder.append(',');
+		}
+		stringBuilder.append("");
+		setIp(stringBuilder.toString());
+		stringBuilder = new StringBuilder();
+		for (int i = 0; i < getViesti().length(); i++){
+		    char c = getViesti().charAt(i);
+		    stringBuilder.append((char)c+1);
+		    stringBuilder.append(',');
+		}
+		setViesti(stringBuilder.toString());
+		//Asetetaan tieto, ett� objektin fieldit on nyt 'salakirjoitettu'
+		setKryptattu(true);
+		out.defaultWriteObject();
+		//Kirjoitetaan ulos defaultilla
+	}
 	/**
 	 * Puretaan sarjallistus
 	 * @param in Mit� kuunnellaan
@@ -74,6 +77,10 @@ public class Viesti implements Serializable{
 	 */
 	private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
 	//Ja k��nnet��n koko homma takaisin ykk�s-Caesarista
+		decrypt(in);
+	}
+	private void decrypt(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
 		in.defaultReadObject();
 		StringBuilder stringBuilder = new StringBuilder();
 		List<String> ipArray =Arrays.asList(getIp().split(","));
