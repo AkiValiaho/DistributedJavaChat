@@ -30,6 +30,15 @@ public class chatClient {
 	 * @throws IOException
 	 */
 	public chatClient(String passedHostName, int passedPortNumber,clientGUI GUI) throws IOException {
+		assignVariables(passedHostName, passedPortNumber, GUI);
+		startReaderThread();
+	}
+	private void startReaderThread() throws IOException {
+		readerThread = new chatClientReaderThread(input,userID,this);
+		readerThread.start();
+	}
+	private void assignVariables(String passedHostName, int passedPortNumber,
+			clientGUI GUI) throws UnknownHostException, IOException {
 		this.GUI = GUI;
 		portNumber = passedPortNumber;
 		hostName = passedHostName;
@@ -37,33 +46,44 @@ public class chatClient {
 		output = new ObjectOutputStream(clientSideSocket.getOutputStream());
 		input = new ObjectInputStream(clientSideSocket.getInputStream());
 		userID = UUID.randomUUID();
-		readerThread = new chatClientReaderThread(input,userID,this);
-		readerThread.start();
 	}
 	public void lahetaViesti(String text) throws IOException {
 		// TODO Auto-generated method stub
 			if (!text.isEmpty()) {
 				Viesti viestiOlio;
 				if (text.equals("LOPETA")) {
-					viestiOlio = new Viesti(text, InetAddress.getLocalHost().getHostAddress(),userID);
-					//Tallennetaan disconnect-k�sky olioon
-					viestiOlio.setDisconnect(true);
-					//Kirjoitetaan disconnect-k�skyn sis�lt�v� olio sokettiin
-					output.writeObject(viestiOlio);
+					writeDisconnectObjectToOutputSocket(text);
 					try {
 						//Ja suljetaan ylim��r�iset jutut pois
-						readerThread.join();
-						clientSideSocket.close();
-						input.close();
-						output.close();
-						System.exit(-1);
+						closePipes();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
-				viestiOlio = new Viesti(text, InetAddress.getLocalHost().getHostAddress(),userID);
-				output.writeObject(viestiOlio);
+				writeViestiToOutputSocket(text);
 		}
+	}
+	private void writeDisconnectObjectToOutputSocket(String text)
+			throws UnknownHostException, IOException {
+		Viesti viestiOlio;
+		viestiOlio = new Viesti(text, InetAddress.getLocalHost().getHostAddress(),userID);
+		//Tallennetaan disconnect-k�sky olioon
+		viestiOlio.setDisconnect(true);
+		//Kirjoitetaan disconnect-k�skyn sis�lt�v� olio sokettiin
+		output.writeObject(viestiOlio);
+	}
+	private void writeViestiToOutputSocket(String text)
+			throws UnknownHostException, IOException {
+		Viesti viestiOlio;
+		viestiOlio = new Viesti(text, InetAddress.getLocalHost().getHostAddress(),userID);
+		output.writeObject(viestiOlio);
+	}
+	private void closePipes() throws InterruptedException, IOException {
+		readerThread.join();
+		clientSideSocket.close();
+		input.close();
+		output.close();
+		System.exit(-1);
 	}
 	public void kirjoitaGUIhin(String viesti) {
 		GUI.kirjoitaKaikkienViesteihin(viesti);

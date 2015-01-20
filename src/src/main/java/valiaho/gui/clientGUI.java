@@ -54,8 +54,12 @@ public class clientGUI {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		initializeGUILayoutAndButtons();
-		JButton lahetaViesti = new JButton("Send message");
+		JButton lahetaViesti = initializeButtonsAndGUILayout();
+		addActionListenerToButton(lahetaViesti);
+		frmChatClient.getContentPane().add(lahetaViesti, "cell 1 1,grow");
+	}
+
+	private void addActionListenerToButton(JButton lahetaViesti) {
 		lahetaViesti.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
@@ -66,14 +70,9 @@ public class clientGUI {
 				}
 			}
 		});
-		frmChatClient.getContentPane().add(lahetaViesti, "cell 1 1,grow");
 	}
-	private void tulostaKayttajat() {
-		//Kutsu tähän metodiin tulee serveriltä itseltään chatClient controllerin kautta
-		//TODO
-		
-	}
-	private void initializeGUILayoutAndButtons() {
+
+	private JButton initializeButtonsAndGUILayout() {
 		frmChatClient = new JFrame();
 		frmChatClient.setTitle("Chat client");
 		frmChatClient.setBounds(100, 100, 741, 533);
@@ -93,6 +92,13 @@ public class clientGUI {
 		kirjoitaViesti = new JTextField();
 		scrollPane_2.setViewportView(kirjoitaViesti);
 		kirjoitaViesti.setColumns(10);
+		JButton lahetaViesti = new JButton("Send message");
+		return lahetaViesti;
+	}
+	private void tulostaKayttajat() {
+		//Kutsu tähän metodiin tulee serveriltä itseltään chatClient controllerin kautta
+		//TODO
+		
 	}
 
 
