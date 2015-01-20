@@ -2,6 +2,10 @@ package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
+import javax.swing.*;
+
+import valiaho.gui.*;
 /**
  * Yksinkertainen chatclienttiohjelma 
  * multithreadaavalle sokettiserverille.
@@ -9,6 +13,15 @@ import java.util.*;
  *
  */
 public class chatClient {
+	private ObjectOutputStream output;
+	private ObjectInputStream input;
+	private UUID userID;
+	private int portNumber;
+	private String hostName;
+	private Socket clientSideSocket;
+	private chatClientReaderThread readerThread;
+	private clientGUI GUI;
+
 	/**
 	 * Clienttiohjelman konstruktori, joka
 	 * py�r�ytt�� ohjelman k�yntiin 
@@ -16,29 +29,23 @@ public class chatClient {
 	 * @param passedPortNumber mihin porttiin yhdistet��n
 	 * @throws IOException
 	 */
-	public chatClient(String passedHostName, int passedPortNumber) throws IOException {
-		int portNumber = passedPortNumber;
-		String hostName = passedHostName;
-		Socket clientSideSocket = new Socket(hostName, portNumber);
-		ObjectOutputStream output = new ObjectOutputStream(clientSideSocket.getOutputStream());
-		ObjectInputStream input = new ObjectInputStream(clientSideSocket.getInputStream());
-		UUID userID = UUID.randomUUID();
-		chatClientReaderThread readerThread = new chatClientReaderThread(input,userID);
+	public chatClient(String passedHostName, int passedPortNumber,clientGUI GUI) throws IOException {
+		this.GUI = GUI;
+		portNumber = passedPortNumber;
+		hostName = passedHostName;
+		clientSideSocket = new Socket(hostName, portNumber);
+		output = new ObjectOutputStream(clientSideSocket.getOutputStream());
+		input = new ObjectInputStream(clientSideSocket.getInputStream());
+		userID = UUID.randomUUID();
+		readerThread = new chatClientReaderThread(input,userID,this);
 		readerThread.start();
-		//Alustan skannerin jo t�ss� ylim��r�isen threadin sijaan, koska scanneri j�tt��
-		//clientin p��lle jos serveri p��tt�� kaatua. Mielest�ni reilumpaa, ett� asiakas ehtii n�hd� viestit, jotka ehdittiin l�hett��
-		//ennen serverin kaatumista.
-		Scanner stringScanner = new Scanner(System.in);
-		while (readerThread.isAlive()) {
-			String string;
-			if (stringScanner.hasNextLine()) {
+	}
+	public void lahetaViesti(String text) throws IOException {
+		// TODO Auto-generated method stub
+			if (!text.isEmpty()) {
 				Viesti viestiOlio;
-				string  = stringScanner.nextLine();
-				if (string.equals("")) {
-					continue;
-				}
-				if (string.equals("LOPETA")) {
-					viestiOlio = new Viesti(string, InetAddress.getLocalHost().getHostAddress(),userID);
+				if (text.equals("LOPETA")) {
+					viestiOlio = new Viesti(text, InetAddress.getLocalHost().getHostAddress(),userID);
 					//Tallennetaan disconnect-k�sky olioon
 					viestiOlio.setDisconnect(true);
 					//Kirjoitetaan disconnect-k�skyn sis�lt�v� olio sokettiin
@@ -54,9 +61,11 @@ public class chatClient {
 						e.printStackTrace();
 					}
 				}
-				viestiOlio = new Viesti(string, InetAddress.getLocalHost().getHostAddress(),userID);
+				viestiOlio = new Viesti(text, InetAddress.getLocalHost().getHostAddress(),userID);
 				output.writeObject(viestiOlio);
-			}
 		}
+	}
+	public void kirjoitaGUIhin(String viesti) {
+		GUI.kirjoitaKaikkienViesteihin(viesti);
 	}
 }

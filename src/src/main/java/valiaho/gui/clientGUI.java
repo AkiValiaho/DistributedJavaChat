@@ -19,6 +19,7 @@ public class clientGUI {
 	private JTextField kirjoitaViesti;
 	private JTextArea kaikkienViestit;
 	private chatClient client;
+	private chatClient chatClient;
 
 	/**
 	 * Launch the application.
@@ -38,16 +39,41 @@ public class clientGUI {
 
 	/**
 	 * Create the application.
+	 * @throws IOException 
 	 */
-	public clientGUI() {
+	public clientGUI() throws IOException {
 		initialize();
+		initializeController();
 		
+	}
+	private void initializeController() throws IOException {
+		this.chatClient = new chatClient("localhost", 12345,this);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		initializeGUILayoutAndButtons();
+		JButton lahetaViesti = new JButton("Send message");
+		lahetaViesti.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					chatClient.lahetaViesti(kirjoitaViesti.getText());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		frmChatClient.getContentPane().add(lahetaViesti, "cell 1 1,grow");
+	}
+	private void tulostaKayttajat() {
+		//Kutsu tähän metodiin tulee serveriltä itseltään chatClient controllerin kautta
+		//TODO
+		
+	}
+	private void initializeGUILayoutAndButtons() {
 		frmChatClient = new JFrame();
 		frmChatClient.setTitle("Chat client");
 		frmChatClient.setBounds(100, 100, 741, 533);
@@ -67,12 +93,17 @@ public class clientGUI {
 		kirjoitaViesti = new JTextField();
 		scrollPane_2.setViewportView(kirjoitaViesti);
 		kirjoitaViesti.setColumns(10);
-		
-		JButton lahetaViesti = new JButton("Send message");
-		lahetaViesti.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
-		frmChatClient.getContentPane().add(lahetaViesti, "cell 1 1,grow");
 	}
+
+
+	/**
+	 * Kirjoitetaan kaikille näkyvään laatikkoon viesti.
+	 * @param viesti Se mitä kirjoitetaan.
+	 */
+	public void kirjoitaKaikkienViesteihin(String viesti) {
+		kaikkienViestit.append(viesti);
+		kaikkienViestit.append("\n");
+		kirjoitaViesti.setText("");
+	}
+
 }

@@ -2,6 +2,10 @@ package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
+import javax.swing.*;
+
+import valiaho.gui.*;
 /**
  * Clienttiohjelman sokettiin tulevaa sy�tett� lukeva threadi
  * @author Aki
@@ -11,15 +15,18 @@ public class chatClientReaderThread extends Thread{
 	private ObjectInputStream in;
 	private UUID userID;
 	private Boolean kuuntelee = true;
+	private chatClient controller;
 	/**
 	 * Konstruktori luokalle
 	 * @param input Mit� kuunnellaan?
 	 * @param userID K�ytt�j�lle luotu ID
+	 * @param kaikkienViestit 
 	 * @throws IOException
 	 */
-	public chatClientReaderThread(ObjectInputStream input, UUID userID) throws IOException {
+	public chatClientReaderThread(ObjectInputStream input, UUID userID,chatClient chatClient) throws IOException {
 		this.in = input;
 		this.userID = userID;
+		this.controller = chatClient;
 	}
 	@Override
 	public void run() {
@@ -43,12 +50,8 @@ public class chatClientReaderThread extends Thread{
 				if (viestiIn.getDisconnect()) {
 					break;
 				}
-				//Samoja viestej� on turha n�ytt�� ne l�hett�neelle k�ytt�j�lle
-				//joten j��d��n odottamaan seuraavaa viesti�
-				if (viesti == null || userID.equals(viestiIn.getUserID())) {
-					continue;
-				}
-				System.out.println(viesti);
+				//TODO lisää tähän referenssi uusien viestien kenttään GUI:hin
+				controller.kirjoitaGUIhin(viesti);
 			} catch (ClassNotFoundException | IOException e) {
 				//Jos palvelimelle sattuu jotakin ep�ilytt�v��
 				System.out.println("Yhteys palvelimelle on katkennut yll�tt�en! Yrit� my�hemmin uudelleen");
