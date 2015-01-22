@@ -52,6 +52,7 @@ public class chatServer{
 	//soketteihin.
 	public static CopyOnWriteArrayList<chatServerThread> arrayOfClients = new CopyOnWriteArrayList<>();
 	public static ServerSocket serverSocket;
+	public static boolean changesToListBoolean = false;
 	public chatServer(Integer portNumber) {
 		this.portNumber = portNumber;
 	}

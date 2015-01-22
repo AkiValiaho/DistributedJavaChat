@@ -1,6 +1,9 @@
 package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
+import java.util.*;
+
+import valiaho.gui.*;
 /**
  * Serverin jokaiselle clientille luoma threadi, joka tutkii asiakkaalta
  * tulevaa sy�tett� ja l�hett�� sen eteenp�in muille threadeille.
@@ -12,6 +15,8 @@ public class chatServerThread extends Thread {
 	private ObjectInputStream in;
 	private Socket socket;
 	private chatServer chatServer;
+	private UUID uuid;
+	private String ip;
 	/**
 	 * Konstruktori luokalle
 	 * @param accept Serverin hyv�ksym� soketti johon muodostettu yhteys passataan argumenttina
@@ -33,7 +38,9 @@ public class chatServerThread extends Thread {
 			try {
 				//Vastaanotetaan asiakkaalta tai serverilt� Viesti-objekti
 				Viesti viesti = (Viesti)in.readObject();
-				if (viesti == null) {
+				if (viesti.getInformationObjectBoolean()) {
+					this.uuid = viesti.getUserID();
+					this.ip = viesti.getIp();
 					continue;
 				}
 				if (viesti.getDisconnect() == true) {
@@ -41,6 +48,7 @@ public class chatServerThread extends Thread {
 					//Poistetaan instanssi listalta
 					chatServer.arrayOfClients.remove(this);
 					//Ilmoitetaan aiheesta
+					chatServer.changesToListBoolean = true;
 					System.out.println(viesti.getIp()+" "+viesti.getUserID()+" "+" on poistunut");
 					out.writeObject(viesti);
 					break;

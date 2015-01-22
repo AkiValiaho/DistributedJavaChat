@@ -46,6 +46,12 @@ public class chatClient {
 		output = new ObjectOutputStream(clientSideSocket.getOutputStream());
 		input = new ObjectInputStream(clientSideSocket.getInputStream());
 		userID = UUID.randomUUID();
+		Viesti viestiOlio;
+		viestiOlio = new Viesti();
+		viestiOlio.setInformationObjectBoolean(true);
+		viestiOlio.setUserID(userID);
+		output.writeObject(viestiOlio);
+		
 	}
 	public void lahetaViesti(String text) throws IOException {
 		// TODO Auto-generated method stub
