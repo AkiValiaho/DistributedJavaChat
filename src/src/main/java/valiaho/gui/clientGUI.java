@@ -7,8 +7,7 @@ import javax.swing.*;
 import valiaho.distributedChat.*;
 import net.miginfocom.swing.MigLayout;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -92,6 +91,30 @@ public class clientGUI {
 		kirjoitaViesti = new JTextField();
 		scrollPane_2.setViewportView(kirjoitaViesti);
 		kirjoitaViesti.setColumns(10);
+		kirjoitaViesti.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					try {
+						chatClient.lahetaViesti(kirjoitaViesti.getText());
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		JButton lahetaViesti = new JButton("Send message");
 		return lahetaViesti;
 	}
