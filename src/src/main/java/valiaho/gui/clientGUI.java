@@ -1,19 +1,16 @@
 package valiaho.gui;
-
 import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 
 import javax.swing.*;
 
+import net.miginfocom.swing.*;
 import valiaho.distributedChat.*;
-import net.miginfocom.swing.MigLayout;
-
-import java.awt.event.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
 
 public class clientGUI {
-
+//TESTITESTITESTI
 	private JFrame frmChatClient;
 	private JTextField kirjoitaViesti;
 	private JTextArea kaikkienViestit;
@@ -30,12 +27,11 @@ public class clientGUI {
 					clientGUI window = new clientGUI();
 					window.frmChatClient.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Yhteyttä ei pystytty luomaan, palvelimet eivät ole päällä?");
 				}
 			}
 		});
 	}
-
 	/**
 	 * Create the application.
 	 * @throws IOException 
@@ -49,16 +45,14 @@ public class clientGUI {
 	private void initializeController() throws IOException {
 		this.chatClient = new chatClient("localhost", 12345,this);
 	}
-
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
 		JButton lahetaViesti = initializeButtonsAndGUILayout();
 		addActionListenerToButton(lahetaViesti);
-		frmChatClient.getContentPane().add(lahetaViesti, "cell 1 1,grow");
+		frmChatClient.getContentPane().add(lahetaViesti, "cell 1 2,grow");
 	}
-
 	private void addActionListenerToButton(JButton lahetaViesti) {
 		lahetaViesti.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -71,29 +65,46 @@ public class clientGUI {
 			}
 		});
 	}
-
 	private JButton initializeButtonsAndGUILayout() {
 		frmChatClient = new JFrame();
 		frmChatClient.setTitle("Chat client");
-		frmChatClient.setBounds(100, 100, 741, 533);
+		frmChatClient.setBounds(100, 100, 898, 598);
 		frmChatClient.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmChatClient.getContentPane().setLayout(new MigLayout("", "[:88.09%:73.23%,grow][grow]", "[323px,grow][62px]"));
+		frmChatClient.getContentPane().setLayout(new MigLayout("", "[:88.09%:73.23%,grow][grow]", "[][323px,grow][62px]"));
+		JToolBar toolBar = new JToolBar();
+		frmChatClient.getContentPane().add(toolBar, "cell 0 0");
 		JScrollPane scrollPane = new JScrollPane();
-		frmChatClient.getContentPane().add(scrollPane, "cell 0 0,grow");
+		frmChatClient.getContentPane().add(scrollPane, "cell 0 1,grow");
 		kaikkienViestit = new JTextArea();
 		kaikkienViestit.setColumns(15);
 		scrollPane.setViewportView(kaikkienViestit);
 		JScrollPane scrollPane_1 = new JScrollPane();
-		frmChatClient.getContentPane().add(scrollPane_1, "cell 1 0,grow");
+		frmChatClient.getContentPane().add(scrollPane_1, "cell 1 1,grow");
 		JTextArea kayttajat = new JTextArea();
 		scrollPane_1.setViewportView(kayttajat);
 		JScrollPane scrollPane_2 = new JScrollPane();
-		frmChatClient.getContentPane().add(scrollPane_2, "cell 0 1,grow");
+		frmChatClient.getContentPane().add(scrollPane_2, "cell 0 2,grow");
 		kirjoitaViesti = new JTextField();
 		scrollPane_2.setViewportView(kirjoitaViesti);
 		kirjoitaViesti.setColumns(10);
 		addEnterListenerToChatBox();
 		JButton lahetaViesti = new JButton("Send message");
+		JButton btnParempiaIhmisi = new JButton("Anna parempia ihmisiä!");
+		btnParempiaIhmisi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							MatcherGUI window = new MatcherGUI();
+							window.frame.setVisible(true);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		});
+		toolBar.add(btnParempiaIhmisi);
 		return lahetaViesti;
 	}
 
@@ -122,13 +133,13 @@ public class clientGUI {
 		});
 	}
 	private void tulostaKayttajat() {
-		//Kutsu tÃ¤hÃ¤n metodiin tulee serveriltÃ¤ itseltÃ¤Ã¤n chatClient controllerin kautta
+		//Kutsu tähän metodiin tulee serveriltä itseltään chatClient controllerin kautta
 		//TODO
 		
 	}
 	/**
-	 * Kirjoitetaan kaikille nÃ¤kyvÃ¤Ã¤n laatikkoon viesti.
-	 * @param viesti Se mitÃ¤ kirjoitetaan.
+	 * Kirjoitetaan kaikille näkyvään laatikkoon viesti.
+	 * @param viesti Se mitä kirjoitetaan.
 	 */
 	public void kirjoitaKaikkienViesteihin(String viesti) {
 		if (onkoViestejaYliRowCountin()) {
@@ -152,7 +163,7 @@ public class clientGUI {
 	}
 
 	private boolean onkoViestejaYliRowCountin() {
-		//TODO kehitÃ¤ tÃ¤hÃ¤n joku pÃ¤tevÃ¤ dynaaminen tarkistus
+		//TODO kehitä tähän joku pätevä dynaaminen tarkistus
 		int height = kaikkienViestit.getHeight();
 		int rowCount = height / 17;
 		if (viestit.size() > rowCount) {
