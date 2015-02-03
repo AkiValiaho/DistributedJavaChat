@@ -19,7 +19,7 @@ public class clientGUI {
 	private JTextArea kaikkienViestit;
 	private chatClient client;
 	private chatClient chatClient;
-
+	private LinkedList<String> viestit;
 	/**
 	 * Launch the application.
 	 */
@@ -41,6 +41,7 @@ public class clientGUI {
 	 * @throws IOException 
 	 */
 	public clientGUI() throws IOException {
+		viestit = new LinkedList<>();
 		initialize();
 		initializeController();
 		
@@ -91,12 +92,16 @@ public class clientGUI {
 		kirjoitaViesti = new JTextField();
 		scrollPane_2.setViewportView(kirjoitaViesti);
 		kirjoitaViesti.setColumns(10);
+		addEnterListenerToChatBox();
+		JButton lahetaViesti = new JButton("Send message");
+		return lahetaViesti;
+	}
+
+	private void addEnterListenerToChatBox() {
 		kirjoitaViesti.addKeyListener(new KeyListener() {
-			
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
 			}
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -112,27 +117,48 @@ public class clientGUI {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		JButton lahetaViesti = new JButton("Send message");
-		return lahetaViesti;
 	}
 	private void tulostaKayttajat() {
 		//Kutsu tähän metodiin tulee serveriltä itseltään chatClient controllerin kautta
 		//TODO
 		
 	}
-
-
 	/**
 	 * Kirjoitetaan kaikille näkyvään laatikkoon viesti.
 	 * @param viesti Se mitä kirjoitetaan.
 	 */
 	public void kirjoitaKaikkienViesteihin(String viesti) {
-		kaikkienViestit.append(viesti);
-		kaikkienViestit.append("\n");
-		kirjoitaViesti.setText("");
+		if (onkoViestejaYliRowCountin()) {
+			viestit.pop();
+			viestit.add(viesti);
+			kaikkienViestit.setText("");
+			for (String string : viestit) {
+				kaikkienViestit.append(string);
+				kaikkienViestit.append("\n");
+				kirjoitaViesti.setText("");
+			}
+		} else {
+			viestit.add(viesti);
+			kaikkienViestit.setText("");
+			for (String string : viestit) {
+				kaikkienViestit.append(string);
+				kaikkienViestit.append("\n");
+				kirjoitaViesti.setText("");
+			}
+		}
+	}
+
+	private boolean onkoViestejaYliRowCountin() {
+		//TODO kehitä tähän joku pätevä dynaaminen tarkistus
+		int height = kaikkienViestit.getHeight();
+		int rowCount = height / 17;
+		if (viestit.size() > rowCount) {
+			return true;
+		}
+		return false;
 	}
 
 }
