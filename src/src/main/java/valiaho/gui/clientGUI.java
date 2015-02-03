@@ -27,7 +27,7 @@ public class clientGUI {
 					clientGUI window = new clientGUI();
 					window.frmChatClient.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Yhteytt‰ ei pystytty luomaan, palvelimet eiv‰t ole p‰‰ll‰?");
 				}
 			}
 		});
