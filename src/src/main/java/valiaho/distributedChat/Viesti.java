@@ -14,6 +14,7 @@ public class Viesti implements Serializable{
 	private UUID userID;
 	private Boolean kryptattu = false;
 	private Boolean yllapitajan = false;
+	private Boolean informationObjectBoolean = false;
 	/**
 	 * Konstuktori luokalle
 	 * @param viesti Viestin sis�lt�
@@ -132,5 +133,11 @@ public class Viesti implements Serializable{
 	}
 	public void setKryptattu(Boolean kryptattu) {
 		this.kryptattu = kryptattu;
+	}
+	public Boolean getInformationObjectBoolean() {
+		return informationObjectBoolean;
+	}
+	public void setInformationObjectBoolean(Boolean informationObjectBoolean) {
+		this.informationObjectBoolean = informationObjectBoolean;
 	}
 }
