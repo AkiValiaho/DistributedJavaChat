@@ -1,12 +1,13 @@
 package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
+import java.security.*;
 import java.util.*;
 
 import javax.crypto.*;
-import javax.swing.*;
 
 import valiaho.gui.*;
+import valiaho.security.*;
 /**
  * Yksinkertainen chatclienttiohjelma 
  * multithreadaavalle sokettiserverille.
@@ -22,6 +23,7 @@ public class chatClient {
 	private Socket clientSideSocket;
 	private chatClientReaderThread readerThread;
 	private clientGUI GUI;
+	private LocalEncryptionFactory<Viesti> encryptionFactory = new LocalEncryptionFactory<>();
 
 	/**
 	 * Clienttiohjelman konstruktori, joka
@@ -33,6 +35,13 @@ public class chatClient {
 	public chatClient(String passedHostName, int passedPortNumber,clientGUI GUI) throws IOException {
 		assignVariables(passedHostName, passedPortNumber, GUI);
 		startReaderThread();
+		setEncryptionFactorySettings();
+		
+	}
+	private void setEncryptionFactorySettings() {
+		encryptionFactory.setAlgorithmString("DES");
+		encryptionFactory.setLocationToKeyString(new File("theKey.txt"));
+		
 	}
 	private void startReaderThread() throws IOException {
 		readerThread = new chatClientReaderThread(input,userID,this);
@@ -51,7 +60,7 @@ public class chatClient {
 		viestiOlio = new Viesti();
 		viestiOlio.setInformationObjectBoolean(true);
 		viestiOlio.setUserID(userID);
-		output.writeObject(viestiOlio);
+		writeSealedObjectToSocket(viestiOlio);
 		
 	}
 	public void lahetaViesti(String text) throws IOException {
@@ -76,14 +85,26 @@ public class chatClient {
 		viestiOlio = new Viesti(text, InetAddress.getLocalHost().getHostAddress(),userID);
 		//Tallennetaan disconnect-k�sky olioon
 		viestiOlio.setDisconnect(true);
-		//Kirjoitetaan disconnect-k�skyn sis�lt�v� olio sokettiin
-		output.writeObject(viestiOlio);
+		writeSealedObjectToSocket(viestiOlio);
 	}
 	private void writeViestiToOutputSocket(String text)
 			throws UnknownHostException, IOException {
 		Viesti viestiOlio;
 		viestiOlio = new Viesti(text, InetAddress.getLocalHost().getHostAddress(),userID);
-		output.writeObject(viestiOlio);
+		writeSealedObjectToSocket(viestiOlio);
+	}
+	private void writeSealedObjectToSocket(Viesti viestiOlio)
+			throws IOException {
+		encryptionFactory.setTt(viestiOlio);
+		SealedObject object;
+		try {
+			object = encryptionFactory.getSealedObject();
+			output.writeObject(object);
+		} catch (InvalidKeyException | NoSuchAlgorithmException
+				| NoSuchPaddingException | IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	private void closePipes() throws InterruptedException, IOException {
 		readerThread.join();
