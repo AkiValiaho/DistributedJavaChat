@@ -3,6 +3,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.crypto.*;
 import javax.swing.*;
 
 import valiaho.gui.*;
