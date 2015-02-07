@@ -171,5 +171,4 @@ public class clientGUI {
 		}
 		return false;
 	}
-
 }

@@ -48,11 +48,11 @@ public class chatClientReaderThread extends Thread{
 				if (viestiIn.getYllapitajan()) {
 					if (viestiIn.getDisconnect()) {
 						//Yllï¿½pitï¿½jï¿½ haluaa sulkea palvelimen
-						System.out.println("Yllï¿½pitï¿½jï¿½ on sammuttanut palvelimen, paina enter lopettaaksesi");
+						JOptionPane.showMessageDialog(null, "Ylläpitäjä sulkee palvelimen");
 						break;
 					} else {
 						//Yllï¿½pitï¿½jï¿½ haluaa sanoa jotain
-						System.out.println("Yllï¿½pitï¿½jï¿½ sanoo: "+viesti);
+						controller.kirjoitaGUIhin("Ylläpitäjä sanoo: "+viesti);
 						continue;
 					}
 				}
@@ -64,7 +64,7 @@ public class chatClientReaderThread extends Thread{
 				controller.kirjoitaGUIhin(viesti);
 			} catch (ClassNotFoundException | IOException e) {
 				//Jos palvelimelle sattuu jotakin epï¿½ilyttï¿½vï¿½ï¿½
-				System.out.println("Yhteys palvelimelle on katkennut yllï¿½ttï¿½en! Yritï¿½ myï¿½hemmin uudelleen");
+				JOptionPane.showMessageDialog(null, "Yhteys palvelimelle on katkennut yllättäen! Yritä myöhemmin uudelleen");
 				break;
 			} catch (InvalidKeyException e) {
 				// TODO Auto-generated catch block
