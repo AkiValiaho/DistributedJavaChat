@@ -1,11 +1,14 @@
 package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
+import java.security.*;
 import java.util.*;
 
+import javax.crypto.*;
 import javax.swing.*;
 
 import valiaho.gui.*;
+import valiaho.security.*;
 /**
  * Clienttiohjelman sokettiin tulevaa sy�tett� lukeva threadi
  * @author Aki
@@ -16,6 +19,7 @@ public class chatClientReaderThread extends Thread{
 	private UUID userID;
 	private Boolean kuuntelee = true;
 	private chatClient controller;
+	private LocalEncryptionFactory encryptionFactory = new LocalEncryptionFactory();
 	/**
 	 * Konstruktori luokalle
 	 * @param input Mit� kuunnellaan?
@@ -30,10 +34,16 @@ public class chatClientReaderThread extends Thread{
 	}
 	@Override
 	public void run() {
+		try {
+			encryptionFactory.setLocationToKeyString(new File("theKey.txt"));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		while (getKuuntelee()) {
 			try {
 				//puretaan sarjallistettu objekti
-				Viesti viestiIn = (Viesti)in.readObject();
+				Viesti viestiIn = encryptionFactory.getDecrypterSealedObject((SealedObject)in.readObject());
 				String viesti = viestiIn.getViesti();
 				if (viestiIn.getYllapitajan()) {
 					if (viestiIn.getDisconnect()) {
@@ -56,6 +66,21 @@ public class chatClientReaderThread extends Thread{
 				//Jos palvelimelle sattuu jotakin ep�ilytt�v��
 				System.out.println("Yhteys palvelimelle on katkennut yll�tt�en! Yrit� my�hemmin uudelleen");
 				break;
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchPaddingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}	
 		}
 	}

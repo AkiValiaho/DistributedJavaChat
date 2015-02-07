@@ -1,8 +1,13 @@
 package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
+import java.security.*;
 import java.util.*;
 import java.util.concurrent.*;
+
+import javax.crypto.*;
+
+import valiaho.security.*;
 /**
  * Yksinkertainen multithreadaava sokettiserveri.
  * 
@@ -53,8 +58,10 @@ public class chatServer{
 	public static CopyOnWriteArrayList<chatServerThread> arrayOfClients = new CopyOnWriteArrayList<>();
 	public static ServerSocket serverSocket;
 	public static boolean changesToListBoolean = false;
+	private LocalEncryptionFactory encryptionFactory;
 	public chatServer(Integer portNumber) {
 		this.portNumber = portNumber;
+		setEncryptionFactory(new LocalEncryptionFactory());
 	}
 	/**
 	 * Toimenpiteet s�ikeen avaamista varten yksitt�iselle clientille
@@ -88,7 +95,7 @@ public class chatServer{
 			chatServer chatServer = new chatServer(portNumber);
 			chatServer.acceptInitialConnection();
 			//Avataan skanneri py�rim��n yll�pit�j�lle
-			Yllapitaja yllapitaja = new Yllapitaja();
+			Yllapitaja yllapitaja = new Yllapitaja(chatServer.getEncryptionFactory());
 			yllapitaja.start();
 			while (kuunnellaan) {
 				//Palvelin ei mene tukkoon jos clienttien m��r�� hieman rajoitetaan
@@ -99,6 +106,12 @@ public class chatServer{
 		} catch (IOException e) {
 			System.exit(-1);
 		}
+	}
+	public LocalEncryptionFactory getEncryptionFactory() {
+		return encryptionFactory;
+	}
+	public void setEncryptionFactory(LocalEncryptionFactory encryptionFactory) {
+		this.encryptionFactory = encryptionFactory;
 	}
 }
 /**
@@ -111,6 +124,24 @@ class Yllapitaja extends Thread {
 	private Scanner scanner = new Scanner(System.in);
 	//Voisi tietysti olla joku hieman pysyv�mpikin tagi. 
 	private UUID yllapitajanUUID = UUID.randomUUID();
+	private LocalEncryptionFactory encryptionFactory; 
+	public Yllapitaja(LocalEncryptionFactory encryptionFactory2) {
+		this.encryptionFactory = encryptionFactory2;
+	}
+	private SealedObject writeSealedObjectToSocket(Viesti viestiOlio)
+			throws IOException {
+		encryptionFactory.setTt(viestiOlio);
+		SealedObject object;
+		try {
+			object = encryptionFactory.getSealedObject();
+			return object;
+		} catch (InvalidKeyException | NoSuchAlgorithmException
+				| NoSuchPaddingException | IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+}
 	@Override
 	public void run() {
 		while (true) {
@@ -122,14 +153,21 @@ class Yllapitaja extends Thread {
 					Viesti yllapitajankatkaisu = new Viesti();
 					yllapitajankatkaisu.setDisconnect(true);
 					yllapitajankatkaisu.setYllapitajan(true);
-					for (chatServerThread thread : chatServer.arrayOfClients) {
-						try {
-							thread.getOut().writeObject(yllapitajankatkaisu);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+					try {
+						SealedObject outObject = writeSealedObjectToSocket(yllapitajankatkaisu);
+						for (chatServerThread thread : chatServer.arrayOfClients) {
+							try {
+								thread.getOut().writeObject(outObject);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
+
 					try {
 						//Ei sovi unohtaa katkaista sokettia!
 						chatServer.serverSocket.close();
@@ -145,9 +183,10 @@ class Yllapitaja extends Thread {
 					try {
 						yllapitajanViesti = new Viesti(scannerLine, InetAddress.getLocalHost().getHostAddress(), yllapitajanUUID);
 						yllapitajanViesti.setYllapitajan(true);
+						SealedObject outObject = writeSealedObjectToSocket(yllapitajanViesti);
 						for (chatServerThread thread : chatServer.arrayOfClients) {
 							try {
-								thread.getOut().writeObject(yllapitajanViesti);
+								thread.getOut().writeObject(outObject);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -156,6 +195,9 @@ class Yllapitaja extends Thread {
 					} catch (UnknownHostException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 				}
 			}

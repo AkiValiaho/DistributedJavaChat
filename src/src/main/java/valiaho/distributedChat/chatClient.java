@@ -23,7 +23,7 @@ public class chatClient {
 	private Socket clientSideSocket;
 	private chatClientReaderThread readerThread;
 	private clientGUI GUI;
-	private LocalEncryptionFactory<Viesti> encryptionFactory = new LocalEncryptionFactory<>();
+	private LocalEncryptionFactory encryptionFactory = new LocalEncryptionFactory();
 
 	/**
 	 * Clienttiohjelman konstruktori, joka
@@ -38,7 +38,7 @@ public class chatClient {
 		setEncryptionFactorySettings();
 		
 	}
-	private void setEncryptionFactorySettings() {
+	private void setEncryptionFactorySettings() throws IOException {
 		encryptionFactory.setAlgorithmString("DES");
 		encryptionFactory.setLocationToKeyString(new File("theKey.txt"));
 		

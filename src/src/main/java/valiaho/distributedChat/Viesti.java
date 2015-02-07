@@ -2,9 +2,25 @@ package valiaho.distributedChat;
 import java.io.*;
 import java.util.*;
 /**
- * Viesti-olio kapsuloi lï¿½hettï¿½jï¿½n IP-osoitteen ja lï¿½hetetyn viestin sarjallistettavaksi
- * luokaksi, jonka olioita voidaan lï¿½hetellï¿½ ObjectOutputStreamin kautta soketteihin.
- * @author Aki Vï¿½liaho
+ * Viesti-luokka kapsuloi lähettäjän ip-osoitteen ja viestin sarjallistettavaan olioon.
+ * Luokan olioita voi lähettää soketteihin objectoutputsteamilla
+ * @author Aki Vï¿½liaho, SoftICE Oy
+ *
+ */
+/**
+ * @author Aki
+ *
+ */
+/**
+ * @author Aki
+ *
+ */
+/**
+ * @author Aki
+ *
+ */
+/**
+ * @author Aki
  *
  */
 public class Viesti implements Serializable{
@@ -30,6 +46,7 @@ public class Viesti implements Serializable{
 	}
 	/**
 	 * Korvaa oletusarvoisen writeObjectin lisï¿½ï¿½mï¿½llï¿½ pï¿½ï¿½lle yksinkertaisen salakirjoituslayerin
+	 * Tarvittaessa tätä salakirjoituslayeriä voi muokata turvallismpaan suuntaan muokkaamalla sen toimijoita toimimaan tietyllä tavalla.
 	 * @param out Mihin kirjoitetaan
 	 * @throws IOException
 	 */
@@ -49,6 +66,7 @@ public class Viesti implements Serializable{
 			encrypt(out);
 		}
 		}
+	//Tästä metodista tulee nyt aivan turha jos saadaan sealedobject toimimaan oikein
 	private void encrypt(ObjectOutputStream out) throws IOException {
 		StringBuilder stringBuilder = new StringBuilder();
 		for (int i = 0; i < getIp().length(); i++){
@@ -98,6 +116,9 @@ public class Viesti implements Serializable{
 		//Asetetaan tieto, ettï¿½ objektin fieldit on purettu
 		setKryptattu(false);
 	}
+	/**
+	 * @return Palauttaa olioon kapseloidun IP-osoitteen public metodin kautta.
+	 */
 	public String getIp() {
 		return ip;
 	}

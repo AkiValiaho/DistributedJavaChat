@@ -1,9 +1,13 @@
 package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
+import java.security.*;
 import java.util.*;
 
+import javax.crypto.*;
+
 import valiaho.gui.*;
+import valiaho.security.*;
 /**
  * Serverin jokaiselle clientille luoma threadi, joka tutkii asiakkaalta
  * tulevaa sy�tett� ja l�hett�� sen eteenp�in muille threadeille.
@@ -17,6 +21,7 @@ public class chatServerThread extends Thread {
 	private chatServer chatServer;
 	private UUID uuid;
 	private String ip;
+	private LocalEncryptionFactory encryptionFactory; 
 	/**
 	 * Konstruktori luokalle
 	 * @param accept Serverin hyv�ksym� soketti johon muodostettu yhteys passataan argumenttina
@@ -27,6 +32,7 @@ public class chatServerThread extends Thread {
 			this.out = new ObjectOutputStream(accept.getOutputStream());
 			this.in = new ObjectInputStream(accept.getInputStream());
 			this.setSocket(accept);
+			this.encryptionFactory = chatServer.getEncryptionFactory();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -34,10 +40,17 @@ public class chatServerThread extends Thread {
 	}
 	@Override
 	public void run() {
+		try {
+			encryptionFactory.setLocationToKeyString(new File("theKey.txt"));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		while (true) {
 			try {
 				//Vastaanotetaan asiakkaalta tai serverilt� Viesti-objekti
-				Viesti viesti = (Viesti)in.readObject();
+				SealedObject readObject = (SealedObject)in.readObject();
+				Viesti viesti = encryptionFactory.getDecrypterSealedObject(readObject);
 				if (viesti.getInformationObjectBoolean()) {
 					this.uuid = viesti.getUserID();
 					this.ip = viesti.getIp();
@@ -56,14 +69,30 @@ public class chatServerThread extends Thread {
 				//L�hetet��n asiakkaiden putkeen saapunut viesti
 				//Ja tulostetaan palvelimelle viesti
 				System.out.println(viesti.getIp()+" "+":"+" "+viesti.getViesti());
+				SealedObject toWrite = writeSealedObjectToSocket(viesti);
 				for (chatServerThread thrad : chatServer.arrayOfClients) {
-					thrad.out.writeObject(viesti);
+					thrad.out.writeObject(toWrite);
 				}
 			} catch (ClassNotFoundException | IOException e) {
 				// TODO Auto-generated catch block
 				chatServer.arrayOfClients.remove(this);
 				System.out.println("Yhteys on katkaistu turvattomasti!");
 				break;
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchPaddingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}	
 		}
 	}
@@ -85,4 +114,18 @@ public class chatServerThread extends Thread {
 	public void setOut(ObjectOutputStream out) {
 		this.out = out;
 	}
+	private SealedObject writeSealedObjectToSocket(Viesti viestiOlio)
+			throws IOException {
+		encryptionFactory.setTt(viestiOlio);
+		SealedObject object;
+		try {
+			object = encryptionFactory.getSealedObject();
+			return object;
+		} catch (InvalidKeyException | NoSuchAlgorithmException
+				| NoSuchPaddingException | IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+}
 }
