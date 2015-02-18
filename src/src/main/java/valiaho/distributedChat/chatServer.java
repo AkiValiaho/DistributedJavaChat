@@ -167,7 +167,6 @@ class Yllapitaja extends Thread {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-
 					try {
 						//Ei sovi unohtaa katkaista sokettia!
 						chatServer.serverSocket.close();
