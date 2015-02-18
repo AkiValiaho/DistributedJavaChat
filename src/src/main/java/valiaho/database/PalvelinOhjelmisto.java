@@ -1,11 +1,10 @@
 package valiaho.database;
-
 import java.io.*;
 import java.net.*;
-
 public class PalvelinOhjelmisto {
 	private Integer portNumber = null;
 	private ServerSocket palvelinSoketti = null;
+	private LukijaThread lukijaThread = null;
 	public PalvelinOhjelmisto() {
 	}
 	public PalvelinOhjelmisto(int portNumber) {
@@ -25,17 +24,28 @@ public class PalvelinOhjelmisto {
 
 		palvelinSoketti = new ServerSocket(getPortNumber());
 		if (!startReaderThread()) {
-			
+			return false;
 		}
 		return true;
 	}
 	
 	/**
-	 * @return Palauttaa truen jos threadi saatiin käynnistettyä
+	 * return Palauttaa falsen jos threadi ei lähde käyntiin
 	 */
 	private boolean startReaderThread() {
-		// TODO Auto-generated method stub
+		try {
+			while (true) {
+				//Odottaa että serverille tulee kutsu
+				palvelinSoketti.accept();
+				this.lukijaThread = new LukijaThread();
+				this.lukijaThread.start();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return false;
+
 	}
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		int portNumber = Integer.parseInt(args[0]);
@@ -55,9 +65,33 @@ public class PalvelinOhjelmisto {
 		this.palvelinSoketti = palvelinSoketti;
 
 	}
+	public LukijaThread getLukijaThread() {
+		return lukijaThread;
+	}
+	public void setLukijaThread(LukijaThread lukijaThread) {
+		this.lukijaThread = lukijaThread;
+	}
 	private class LukijaThread extends Thread {
 		@Override
 		public void run() {
+		//Käynnistä threadi joka hoitaa saapuneen viestin tallentamisen DB:lle
+		lueViesti();
+		//Terminatee lukemisen jälkeen
+		}
+
+		private void lueViesti() {
+			//Ota viesti vastaan ja lähetä se lähettäjä Threadille
+			// + viestistä otetut ominaisuudet, decryptaa paketti
+			LahettajaThread lahettajaThread = new LahettajaThread();
+			lahettajaThread.start();
+		}
+	}
+	private class LahettajaThread extends Thread {
+		@Override
+		public void run() {
+			lahetaTiedotDB();
+		}
+		private void lahetaTiedotDB() {
 			// TODO Auto-generated method stub
 		}
 	}
