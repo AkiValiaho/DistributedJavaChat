@@ -52,6 +52,8 @@ public class chatServerThread extends Thread {
 				SealedObject readObject = (SealedObject)in.readObject();
 				Viesti viesti = encryptionFactory.getDecrypterSealedObject(readObject);
 				if (viesti.getInformationObjectBoolean()) {
+					//Haluan että nämä tiedot menisi myös jossakin välissä tietyllä timelimitillä erillisessä threadissa
+					//erilliselle DB:lle!
 					this.uuid = viesti.getUserID();
 					this.ip = viesti.getIp();
 					continue;
