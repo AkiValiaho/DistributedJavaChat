@@ -58,6 +58,7 @@ public class chatServer{
 	public static CopyOnWriteArrayList<chatServerThread> arrayOfClients = new CopyOnWriteArrayList<>();
 	public static ServerSocket serverSocket;
 	public static boolean changesToListBoolean = false;
+	public static ArrayList<Viesti> kaikkiViestit = new ArrayList<>();
 	private LocalEncryptionFactory encryptionFactory;
 	public chatServer(Integer portNumber) {
 		this.portNumber = portNumber;

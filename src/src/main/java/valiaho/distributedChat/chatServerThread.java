@@ -56,6 +56,8 @@ public class chatServerThread extends Thread {
 					//erilliselle DB:lle!
 					this.uuid = viesti.getUserID();
 					this.ip = viesti.getIp();
+					viesti.setViesti("Käyttäjä yhdisti palveluun");
+					chatServer.kaikkiViestit.add(viesti);
 					continue;
 				}
 				if (viesti.getDisconnect() == true) {
@@ -65,11 +67,14 @@ public class chatServerThread extends Thread {
 					//Ilmoitetaan aiheesta
 					chatServer.changesToListBoolean = true;
 					System.out.println(viesti.getIp()+" "+viesti.getUserID()+" "+" on poistunut");
+					viesti.setViesti("Käyttäjä on poistunut");
+					chatServer.kaikkiViestit.add(viesti);
 					out.writeObject(viesti);
 					break;
 				}
 				//Lï¿½hetetï¿½ï¿½n asiakkaiden putkeen saapunut viesti
 				//Ja tulostetaan palvelimelle viesti
+				chatServer.kaikkiViestit.add(viesti);
 				System.out.println(viesti.getIp()+" "+":"+" "+viesti.getViesti());
 				SealedObject toWrite = writeSealedObjectToSocket(viesti);
 				for (chatServerThread thrad : chatServer.arrayOfClients) {

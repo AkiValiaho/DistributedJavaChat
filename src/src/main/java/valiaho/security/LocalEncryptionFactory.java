@@ -81,6 +81,16 @@ public class LocalEncryptionFactory {
 	    Viesti viesti = (Viesti) object.getObject(cipher);
 	    return viesti;
 		}
+	public ArrayList<Viesti> getDecrypterSealedObjectArrayList(SealedObject object) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, IOException {
+		if (object == null) {
+			return null;
+		}
+		String algorithmName = object.getAlgorithm();
+	    Cipher cipher = Cipher.getInstance(algorithmName);
+	    cipher.init(Cipher.DECRYPT_MODE, key);
+	    ArrayList<Viesti> viestiLista= (ArrayList<Viesti>) object.getObject(cipher);
+	    return viestiLista;
+		}
 	public void setSealedObject(SealedObject sealedObject) {
 		this.sealedObject = sealedObject;
 	}

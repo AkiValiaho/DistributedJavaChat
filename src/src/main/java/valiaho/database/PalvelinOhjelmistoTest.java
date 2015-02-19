@@ -10,7 +10,7 @@ public class PalvelinOhjelmistoTest {
 
 	@Test
 	public void testIfPortNumberNullReturnsFalse() {
-		PalvelinOhjelmisto palvelinOhjelmisto = new PalvelinOhjelmisto();
+		SQLPalvelinOhjelmisto palvelinOhjelmisto = new SQLPalvelinOhjelmisto();
 		try {
 			assertFalse(palvelinOhjelmisto.kaynnistaPalvelin());
 		} catch (IOException e) {
@@ -21,10 +21,10 @@ public class PalvelinOhjelmistoTest {
 
 	@Test
 	public void testIfPortNumberOutOfScopeReturnsFalse() {
-		PalvelinOhjelmisto palvelinOhjelmisto = new PalvelinOhjelmisto(65536);
+		SQLPalvelinOhjelmisto palvelinOhjelmisto = new SQLPalvelinOhjelmisto(65536);
 		try {
 			assertFalse(palvelinOhjelmisto.kaynnistaPalvelin());
-			palvelinOhjelmisto = new PalvelinOhjelmisto(0);
+			palvelinOhjelmisto = new SQLPalvelinOhjelmisto(0);
 			assertFalse(palvelinOhjelmisto.kaynnistaPalvelin());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
