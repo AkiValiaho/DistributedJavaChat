@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 
 import javax.crypto.*;
 
+import valiaho.database.*;
 import valiaho.security.*;
 /**
  * Yksinkertainen multithreadaava sokettiserveri.
@@ -97,7 +98,12 @@ public class chatServer{
 			chatServer.acceptInitialConnection();
 			//Avataan skanneri pyï¿½rimï¿½ï¿½n yllï¿½pitï¿½jï¿½lle
 			Yllapitaja yllapitaja = new Yllapitaja(chatServer.getEncryptionFactory());
+			//Startataan tässä ylläpitäjän oma threadi serverille
 			yllapitaja.start();
+			//Sitten startataan Viestejä DB:lle uppaava timertask
+			Timer timer = new Timer();
+			timer.scheduleAtFixedRate(new DBUploaderThread(kaikkiViestit), 10000, 5000);
+			
 			while (kuunnellaan) {
 				//Palvelin ei mene tukkoon jos clienttien mï¿½ï¿½rï¿½ï¿½ hieman rajoitetaan
 				if (chatServer.arrayOfClients.size() < 500) {
@@ -158,6 +164,7 @@ class Yllapitaja extends Thread {
 						SealedObject outObject = writeSealedObjectToSocket(yllapitajankatkaisu);
 						for (chatServerThread thread : chatServer.arrayOfClients) {
 							try {
+								//Kirjoita objekti ulkopuskurin toimimaan.
 								thread.getOut().writeObject(outObject);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
