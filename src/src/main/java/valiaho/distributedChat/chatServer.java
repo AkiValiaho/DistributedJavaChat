@@ -102,8 +102,8 @@ public class chatServer{
 			yllapitaja.start();
 			//Sitten startataan Viestejä DB:lle uppaava timertask
 			Timer timer = new Timer();
-			timer.scheduleAtFixedRate(new DBUploaderThread(kaikkiViestit), 10000, 5000);
-			
+			timer.scheduleAtFixedRate(new DBUploaderThread(kaikkiViestit), 10000, 50000);
+
 			while (kuunnellaan) {
 				//Palvelin ei mene tukkoon jos clienttien mï¿½ï¿½rï¿½ï¿½ hieman rajoitetaan
 				if (chatServer.arrayOfClients.size() < 500) {
@@ -135,20 +135,7 @@ class Yllapitaja extends Thread {
 	public Yllapitaja(LocalEncryptionFactory encryptionFactory2) {
 		this.encryptionFactory = encryptionFactory2;
 	}
-	private SealedObject writeSealedObjectToSocket(Viesti viestiOlio)
-			throws IOException {
-		encryptionFactory.setTt(viestiOlio);
-		SealedObject object;
-		try {
-			object = encryptionFactory.getSealedObject();
-			return object;
-		} catch (InvalidKeyException | NoSuchAlgorithmException
-				| NoSuchPaddingException | IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-}
+
 	@Override
 	public void run() {
 		while (true) {
@@ -161,7 +148,7 @@ class Yllapitaja extends Thread {
 					yllapitajankatkaisu.setDisconnect(true);
 					yllapitajankatkaisu.setYllapitajan(true);
 					try {
-						SealedObject outObject = writeSealedObjectToSocket(yllapitajankatkaisu);
+						SealedObject outObject = LocalEncryptionFactory.writeSealedObjectToSocket(yllapitajankatkaisu, encryptionFactory);
 						for (chatServerThread thread : chatServer.arrayOfClients) {
 							try {
 								//Kirjoita objekti ulkopuskurin toimimaan.
@@ -190,7 +177,7 @@ class Yllapitaja extends Thread {
 					try {
 						yllapitajanViesti = new Viesti(scannerLine, InetAddress.getLocalHost().getHostAddress(), yllapitajanUUID);
 						yllapitajanViesti.setYllapitajan(true);
-						SealedObject outObject = writeSealedObjectToSocket(yllapitajanViesti);
+						SealedObject outObject = LocalEncryptionFactory.writeSealedObjectToSocket(yllapitajanViesti, encryptionFactory);
 						for (chatServerThread thread : chatServer.arrayOfClients) {
 							try {
 								thread.getOut().writeObject(outObject);

@@ -40,9 +40,7 @@ public class SQLPalvelinOhjelmisto {
 		}
 
 		palvelinSoketti = new ServerSocket(getPortNumber());
-		if (!startReaderThread()) {
-			return false;
-		}
+		startReaderThread();
 		return true;
 	}
 	
@@ -50,19 +48,18 @@ public class SQLPalvelinOhjelmisto {
 	 * return Palauttaa falsen jos threadi ei lähde käyntiin
 	 * @throws IOException 
 	 */
-	private boolean startReaderThread() throws IOException {
-		this.in = new ObjectInputStream(socket.getInputStream());
-		this.out = new ObjectOutputStream(socket.getOutputStream());
-			while (true) {
+	private void startReaderThread() throws IOException {
+
 				//Odottaa että serverille tulee kutsu
 				this.socket = palvelinSoketti.accept();
+				this.in = new ObjectInputStream(socket.getInputStream());
+				this.out = new ObjectOutputStream(socket.getOutputStream());
 				this.lukijaThread = new LukijaThread();
 				this.lukijaThread.start();
-			}
 	}
 	public static void main(String[] args) throws NumberFormatException, IOException {
-		int portNumber = Integer.parseInt(args[0]);
-		SQLPalvelinOhjelmisto ohjelmisto = new SQLPalvelinOhjelmisto(portNumber);
+		SQLPalvelinOhjelmisto ohjelmisto = new SQLPalvelinOhjelmisto(54321);
+		ohjelmisto.kaynnistaPalvelin();
 		
 	}
 	public Integer getPortNumber() {
@@ -89,7 +86,9 @@ public class SQLPalvelinOhjelmisto {
 		public void run() {
 		//Käynnistä threadi joka hoitaa saapuneen viestin tallentamisen DB:lle
 		try {
-			lueViesti();
+			while (true) {
+				lueViesti();
+			}
 		} catch (InvalidKeyException | ClassNotFoundException
 				| NoSuchAlgorithmException | NoSuchPaddingException
 				| IllegalBlockSizeException | BadPaddingException | IOException e) {
@@ -129,7 +128,9 @@ public class SQLPalvelinOhjelmisto {
 		}
 		private void lahetaTiedotDB() {
 			//Iteroi jokainen Viesti arraylististä läpi ja lähetä tiedot DB:lle
-			
+			for (Viesti viesti : viestiArrayList) {
+				System.out.println(viesti.getViesti());
+			}
 		}
 		public ArrayList<Viesti> getViestiArrayList() {
 			return viestiArrayList;

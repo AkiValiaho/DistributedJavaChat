@@ -8,7 +8,6 @@ import javax.swing.*;
 
 import net.miginfocom.swing.*;
 import valiaho.distributedChat.*;
-
 public class clientGUI {
 //TESTITESTITESTI
 	private JFrame frmChatClient;

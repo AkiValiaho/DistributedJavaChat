@@ -15,6 +15,7 @@ public class LocalEncryptionFactory {
 	private File locationToKeyString;
 	private String algorithmString;
 	private Viesti tt;
+	private ArrayList<Viesti> kaikkiViestit;
 	private static Key key; 
 	public LocalEncryptionFactory(SealedObject object) {
 		this.setSealedObject(object);
@@ -26,6 +27,21 @@ public class LocalEncryptionFactory {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public static SealedObject writeSealedObjectToSocket(Viesti viestiOlio, LocalEncryptionFactory encryptionFactory)
+			throws IOException {
+		encryptionFactory.setTt(viestiOlio);
+		SealedObject object;
+		try {
+			object = encryptionFactory.getSealedObject();
+			return object;
+		} catch (InvalidKeyException | NoSuchAlgorithmException
+				| NoSuchPaddingException | IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
 		}
 	}
 	/**
@@ -118,5 +134,37 @@ public class LocalEncryptionFactory {
 	}
 	public static void setKey(Key key) {
 		LocalEncryptionFactory.key = key;
+	}
+	public static Object writeSealedObjectToSocket(
+			ArrayList<Viesti> kaikkiViestit,
+			LocalEncryptionFactory encryptionFactory) throws IOException {
+			encryptionFactory.setTt(kaikkiViestit);
+			SealedObject object;
+			try {
+				object = encryptionFactory.getSealedObjectFromArrayList();
+				return object;
+			} catch (InvalidKeyException | NoSuchAlgorithmException
+					| NoSuchPaddingException | IllegalBlockSizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+		}
+	}
+	private void setTt(ArrayList<Viesti> kaikkiViestit) {
+		this.kaikkiViestit = kaikkiViestit;
+	}
+	private SealedObject getSealedObjectFromArrayList() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
+		  Cipher cipher = null;
+		try {
+			cipher = Cipher.getInstance(algorithmString);
+			  cipher.init(Cipher.ENCRYPT_MODE,getKey());
+			  setSealedObject(new SealedObject((Serializable) kaikkiViestit, cipher));
+			  return this.sealedObject;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return sealedObject;
+
 	}
 }

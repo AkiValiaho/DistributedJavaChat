@@ -1,10 +1,7 @@
 package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
-import java.security.*;
 import java.util.*;
-
-import javax.crypto.*;
 
 import valiaho.gui.*;
 import valiaho.security.*;
@@ -60,8 +57,7 @@ public class chatClient {
 		viestiOlio = new Viesti();
 		viestiOlio.setInformationObjectBoolean(true);
 		viestiOlio.setUserID(userID);
-		writeSealedObjectToSocket(viestiOlio);
-		
+		output.writeObject(LocalEncryptionFactory.writeSealedObjectToSocket(viestiOlio, encryptionFactory));
 	}
 	public void lahetaViesti(String text) throws IOException {
 		// TODO Auto-generated method stub
@@ -85,26 +81,13 @@ public class chatClient {
 		viestiOlio = new Viesti(text, InetAddress.getLocalHost().getHostAddress(),userID);
 		//Tallennetaan disconnect-k�sky olioon
 		viestiOlio.setDisconnect(true);
-		writeSealedObjectToSocket(viestiOlio);
+		output.writeObject(LocalEncryptionFactory.writeSealedObjectToSocket(viestiOlio, encryptionFactory));
 	}
 	private void writeViestiToOutputSocket(String text)
 			throws UnknownHostException, IOException {
 		Viesti viestiOlio;
 		viestiOlio = new Viesti(text, InetAddress.getLocalHost().getHostAddress(),userID);
-		writeSealedObjectToSocket(viestiOlio);
-	}
-	private void writeSealedObjectToSocket(Viesti viestiOlio)
-			throws IOException {
-		encryptionFactory.setTt(viestiOlio);
-		SealedObject object;
-		try {
-			object = encryptionFactory.getSealedObject();
-			output.writeObject(object);
-		} catch (InvalidKeyException | NoSuchAlgorithmException
-				| NoSuchPaddingException | IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		output.writeObject(LocalEncryptionFactory.writeSealedObjectToSocket(viestiOlio, encryptionFactory));
 	}
 	private void closePipes() throws InterruptedException, IOException {
 		readerThread.join();

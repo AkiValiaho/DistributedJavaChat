@@ -76,7 +76,7 @@ public class chatServerThread extends Thread {
 				//Ja tulostetaan palvelimelle viesti
 				chatServer.kaikkiViestit.add(viesti);
 				System.out.println(viesti.getIp()+" "+":"+" "+viesti.getViesti());
-				SealedObject toWrite = writeSealedObjectToSocket(viesti);
+				SealedObject toWrite = LocalEncryptionFactory.writeSealedObjectToSocket(viesti, encryptionFactory);
 				for (chatServerThread thrad : chatServer.arrayOfClients) {
 					thrad.out.writeObject(toWrite);
 				}
@@ -121,18 +121,4 @@ public class chatServerThread extends Thread {
 	public void setOut(ObjectOutputStream out) {
 		this.out = out;
 	}
-	private SealedObject writeSealedObjectToSocket(Viesti viestiOlio)
-			throws IOException {
-		encryptionFactory.setTt(viestiOlio);
-		SealedObject object;
-		try {
-			object = encryptionFactory.getSealedObject();
-			return object;
-		} catch (InvalidKeyException | NoSuchAlgorithmException
-				| NoSuchPaddingException | IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-}
 }
