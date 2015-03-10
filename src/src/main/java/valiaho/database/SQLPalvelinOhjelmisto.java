@@ -10,12 +10,12 @@ import valiaho.distributedChat.*;
 import valiaho.security.*;
 public class SQLPalvelinOhjelmisto {
 	private Integer portNumber = null;
-	private ServerSocket palvelinSoketti = null;
-	private LukijaThread lukijaThread = null;
 	private LocalEncryptionFactory encryptionFactory = null;
-	private Socket socket;
-	private ObjectOutputStream out;
+	private LukijaThread lukijaThread = null;
 	private ObjectInputStream in;
+	private ObjectOutputStream out;
+	private ServerSocket palvelinSoketti = null;
+	private Socket socket;
 	public SQLPalvelinOhjelmisto() {
 	}
 	public SQLPalvelinOhjelmisto(int portNumber) {
@@ -49,7 +49,6 @@ public class SQLPalvelinOhjelmisto {
 	 * @throws IOException 
 	 */
 	private void startReaderThread() throws IOException {
-
 				//Odottaa että serverille tulee kutsu
 				this.socket = palvelinSoketti.accept();
 				this.in = new ObjectInputStream(socket.getInputStream());

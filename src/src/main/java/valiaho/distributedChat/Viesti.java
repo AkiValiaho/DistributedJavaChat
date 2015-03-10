@@ -7,35 +7,19 @@ import java.util.*;
  * @author Aki V�liaho, SoftICE Oy
  *
  */
-/**
- * @author Aki
- *
- */
-/**
- * @author Aki
- *
- */
-/**
- * @author Aki
- *
- */
-/**
- * @author Aki
- *
- */
 public class Viesti implements Serializable{
-	private static final long serialVersionUID = 1L;
-	private String ip = "0",viesti ="0";
 	private Boolean disconnect = false;
-	private UUID userID;
+	private Boolean informationObjectBoolean = false;
 	private Boolean kryptattu = false;
 	private Boolean yllapitajan = false;
-	private Boolean informationObjectBoolean = false;
+	private static final long serialVersionUID = 1L;
+	private String ip = "0",viesti ="0";
+	private UUID userID;
 	/**
 	 * Konstuktori luokalle
-	 * @param viesti Viestin sis�lt�
 	 * @param ip L�hett�j�n IP-osoite
 	 * @param userID2 L�hett�j�n uniikki UIID
+	 * @param viesti Viestin sis�lt�
 	 */
 	public Viesti(String viesti, String ip, UUID userID2) {
 		this.setIp(ip);

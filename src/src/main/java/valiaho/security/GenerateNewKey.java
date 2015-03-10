@@ -7,8 +7,8 @@ import java.util.*;
 import javax.crypto.*;
 
 public class GenerateNewKey {
-public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
-		KeyGenerator generator; 
+	public GenerateNewKey() throws NoSuchAlgorithmException, IOException {
+	KeyGenerator generator; 
 	 generator = KeyGenerator.getInstance("DES"); 
 	 generator.init(new SecureRandom()); 
 	 Key randomDESKey = generator.generateKey(); 
@@ -17,5 +17,8 @@ public static void main(String[] args) throws NoSuchAlgorithmException, IOExcept
 	 BufferedWriter newWriter = new BufferedWriter(writer);
 	 newWriter.write(Base64.getEncoder().encodeToString(randomDESKey.getEncoded()));
 	 newWriter.close();
+	}
+public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
+	GenerateNewKey newKey = new GenerateNewKey();
 }
 }

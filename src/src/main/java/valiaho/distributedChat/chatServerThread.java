@@ -15,13 +15,15 @@ import valiaho.security.*;
  *
  */
 public class chatServerThread extends Thread {
-	private ObjectOutputStream out;
-	private ObjectInputStream in;
-	private Socket socket;
 	private chatServer chatServer;
-	private UUID uuid;
+	private LocalEncryptionFactory encryptionFactory;
+	private ObjectInputStream in;
+	private ObjectOutputStream out;
+	private SealedObject readObject;
+	private SealedObject toWrite; 
+	private Socket socket;
 	private String ip;
-	private LocalEncryptionFactory encryptionFactory; 
+	private UUID uuid;
 	/**
 	 * Konstruktori luokalle
 	 * @param accept Serverin hyvï¿½ksymï¿½ soketti johon muodostettu yhteys passataan argumenttina
@@ -48,8 +50,7 @@ public class chatServerThread extends Thread {
 		}
 		while (true) {
 			try {
-				//Vastaanotetaan asiakkaalta tai serveriltï¿½ Viesti-objekti
-				SealedObject readObject = (SealedObject)in.readObject();
+				readObject = (SealedObject)in.readObject();
 				Viesti viesti = encryptionFactory.getDecrypterSealedObject(readObject);
 				if (viesti.getInformationObjectBoolean()) {
 					//Haluan että nämä tiedot menisi myös jossakin välissä tietyllä timelimitillä erillisessä threadissa
@@ -76,7 +77,7 @@ public class chatServerThread extends Thread {
 				//Ja tulostetaan palvelimelle viesti
 				chatServer.kaikkiViestit.add(viesti);
 				System.out.println(viesti.getIp()+" "+":"+" "+viesti.getViesti());
-				SealedObject toWrite = LocalEncryptionFactory.writeSealedObjectToSocket(viesti, encryptionFactory);
+				toWrite = LocalEncryptionFactory.writeSealedObjectToSocket(viesti, encryptionFactory);
 				for (chatServerThread thrad : chatServer.arrayOfClients) {
 					thrad.out.writeObject(toWrite);
 				}

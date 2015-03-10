@@ -2,21 +2,19 @@ package valiaho.security;
 import java.io.*;
 import java.security.*;
 import java.util.*;
-
 import javax.crypto.*;
 import javax.crypto.spec.*;
-
 import valiaho.distributedChat.*;
 /**
  * @author Aki Väliaho, SoftICE Oy
  */
 public class LocalEncryptionFactory {
-	private SealedObject sealedObject;
+	private ArrayList<Viesti> kaikkiViestit;
 	private File locationToKeyString;
+	private SealedObject sealedObject;
+	private static Key key; 
 	private String algorithmString;
 	private Viesti tt;
-	private ArrayList<Viesti> kaikkiViestit;
-	private static Key key; 
 	public LocalEncryptionFactory(SealedObject object) {
 		this.setSealedObject(object);
 	}
@@ -29,7 +27,6 @@ public class LocalEncryptionFactory {
 			e.printStackTrace();
 		}
 	}
-	
 	public static SealedObject writeSealedObjectToSocket(Viesti viestiOlio, LocalEncryptionFactory encryptionFactory)
 			throws IOException {
 		encryptionFactory.setTt(viestiOlio);
@@ -46,14 +43,14 @@ public class LocalEncryptionFactory {
 	}
 	/**
 	 * Yleiskäyttöinen factory DES-tyylisen kryptauksen ja olion paketoinnin suorittamiseen
-	 * @param t
 	 * @param algorithm
 	 * @param locationToKey	File objekti avaimeen
+	 * @param t
+	 * @throws IllegalBlockSizeException
+	 * @throws InvalidKeyException
+	 * @throws IOException Ei pysty avaamaan handlea tiedostoon!
 	 * @throws NoSuchAlgorithmException Tätä kyseistä algoritmia ei löydy määritellystä listasta
 	 * @throws NoSuchPaddingException Hashtablesta ei löydy 
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws IOException Ei pysty avaamaan handlea tiedostoon!
 	 */
 	public LocalEncryptionFactory(Viesti t,String algorithm,File locationToKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
 		  this.setTt(t);
@@ -75,11 +72,11 @@ public class LocalEncryptionFactory {
 	}
 	/**
 	 * @return Palauttaa valmiin sealedObjektin
+	 * @throws IllegalBlockSizeException Blokin koko ei vastaa annettua avainta
 	 * @throws InvalidKeyException avain on virheellinens
+	 * @throws IOException Ei pysty avaamaan kahvaa tiedoston
 	 * @throws NoSuchAlgorithmException Kyseistä algoritmia ei löydy määritellyistä tapauksista
 	 * @throws NoSuchPaddingException
-	 * @throws IOException Ei pysty avaamaan kahvaa tiedoston
-	 * @throws IllegalBlockSizeException Blokin koko ei vastaa annettua avainta
 	 */
 	public SealedObject getSealedObject() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException {
 			  Cipher cipher=Cipher.getInstance(algorithmString);
@@ -107,6 +104,35 @@ public class LocalEncryptionFactory {
 	    ArrayList<Viesti> viestiLista= (ArrayList<Viesti>) object.getObject(cipher);
 	    return viestiLista;
 		}
+	private SealedObject getSealedObjectFromArrayList() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
+		  Cipher cipher = null;
+		try {
+			cipher = Cipher.getInstance(algorithmString);
+			  cipher.init(Cipher.ENCRYPT_MODE,getKey());
+			  setSealedObject(new SealedObject((Serializable) kaikkiViestit, cipher));
+			  return this.sealedObject;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return sealedObject;
+	}
+	public static Object writeSealedObjectToSocket(
+			ArrayList<Viesti> kaikkiViestit,
+			LocalEncryptionFactory encryptionFactory) throws IOException {
+			encryptionFactory.setTt(kaikkiViestit);
+			SealedObject object;
+			try {
+				object = encryptionFactory.getSealedObjectFromArrayList();
+				return object;
+			} catch (InvalidKeyException | NoSuchAlgorithmException
+					| NoSuchPaddingException | IllegalBlockSizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+		}
+	}
+	//Small methods
 	public void setSealedObject(SealedObject sealedObject) {
 		this.sealedObject = sealedObject;
 	}
@@ -135,36 +161,7 @@ public class LocalEncryptionFactory {
 	public static void setKey(Key key) {
 		LocalEncryptionFactory.key = key;
 	}
-	public static Object writeSealedObjectToSocket(
-			ArrayList<Viesti> kaikkiViestit,
-			LocalEncryptionFactory encryptionFactory) throws IOException {
-			encryptionFactory.setTt(kaikkiViestit);
-			SealedObject object;
-			try {
-				object = encryptionFactory.getSealedObjectFromArrayList();
-				return object;
-			} catch (InvalidKeyException | NoSuchAlgorithmException
-					| NoSuchPaddingException | IllegalBlockSizeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return null;
-		}
-	}
 	private void setTt(ArrayList<Viesti> kaikkiViestit) {
 		this.kaikkiViestit = kaikkiViestit;
-	}
-	private SealedObject getSealedObjectFromArrayList() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
-		  Cipher cipher = null;
-		try {
-			cipher = Cipher.getInstance(algorithmString);
-			  cipher.init(Cipher.ENCRYPT_MODE,getKey());
-			  setSealedObject(new SealedObject((Serializable) kaikkiViestit, cipher));
-			  return this.sealedObject;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return sealedObject;
-
 	}
 }

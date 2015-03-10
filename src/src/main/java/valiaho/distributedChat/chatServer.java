@@ -1,7 +1,6 @@
 package valiaho.distributedChat;
 import java.io.*;
 import java.net.*;
-import java.security.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -56,11 +55,11 @@ public class chatServer{
 	//T�ss� tapauksessa chat-ohjelma esimerkiksi viett�� suurimman osan ajastaan maalaisj�rjen mukaan
 	//tutkiskellen onko tullut uusia viestej� eli iteroiden Clienttej� l�pi ja ymp�ten uusia viestej�
 	//soketteihin.
+	private LocalEncryptionFactory encryptionFactory;
+	public static ArrayList<Viesti> kaikkiViestit = new ArrayList<>();
+	public static boolean changesToListBoolean = false;
 	public static CopyOnWriteArrayList<chatServerThread> arrayOfClients = new CopyOnWriteArrayList<>();
 	public static ServerSocket serverSocket;
-	public static boolean changesToListBoolean = false;
-	public static ArrayList<Viesti> kaikkiViestit = new ArrayList<>();
-	private LocalEncryptionFactory encryptionFactory;
 	public chatServer(Integer portNumber) {
 		this.portNumber = portNumber;
 		setEncryptionFactory(new LocalEncryptionFactory());
@@ -128,10 +127,9 @@ public class chatServer{
  *
  */
 class Yllapitaja extends Thread {
-	private Scanner scanner = new Scanner(System.in);
-	//Voisi tietysti olla joku hieman pysyv�mpikin tagi. 
-	private UUID yllapitajanUUID = UUID.randomUUID();
 	private LocalEncryptionFactory encryptionFactory; 
+	private Scanner scanner = new Scanner(System.in);
+	private UUID yllapitajanUUID = UUID.randomUUID();
 	public Yllapitaja(LocalEncryptionFactory encryptionFactory2) {
 		this.encryptionFactory = encryptionFactory2;
 	}

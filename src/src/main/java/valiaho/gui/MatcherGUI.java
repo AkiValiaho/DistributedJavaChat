@@ -1,7 +1,5 @@
 package valiaho.gui;
 
-import java.awt.*;
-
 import javax.swing.*;
 
 public class MatcherGUI {
@@ -27,10 +25,12 @@ public class MatcherGUI {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
+		createNewComponents();
 		frame.setBounds(100, 100, 842, 529);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-
+	private void createNewComponents() {
+		frame = new JFrame();
+	}
 }
 

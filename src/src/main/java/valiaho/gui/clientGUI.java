@@ -3,108 +3,104 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-
 import javax.swing.*;
-
 import net.miginfocom.swing.*;
 import valiaho.distributedChat.*;
 public class clientGUI {
 //TESTITESTITESTI
-	private JFrame frmChatClient;
-	private JTextField kirjoitaViesti;
-	private JTextArea kaikkienViestit;
-	private chatClient client;
 	private chatClient chatClient;
+	private chatClient client;
+	private JButton btnParempiaIhmisi;
+	private JButton lahetaViesti;
+	private JFrame frmChatFrame;
+	private JScrollPane scrollPane;
+	private JScrollPane scrollPane_1;
+	private JScrollPane scrollPane_2;
+	private JTextArea kaikkienViestit;
+	private JTextArea kayttajat;
+	private JTextField kirjoitaViesti;
+	private JToolBar toolBar;
 	private LinkedList<String> viestit;
+	//Konstruktorit
+	public clientGUI() throws IOException {
+		viestit = new LinkedList<>();
+		initialize();
+		initializeController();
+	}
 	/**
-	 * Launch the application.
+	 * Main-ohjelma
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					clientGUI window = new clientGUI();
-					window.frmChatClient.setVisible(true);
+					window.frmChatFrame.setVisible(true);
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "Yhteytt‰ ei pystytty luomaan, palvelimet eiv‰t ole p‰‰ll‰?");
 				}
 			}
 		});
 	}
-	/**
-	 * Create the application.
-	 * @throws IOException 
-	 */
-	public clientGUI() throws IOException {
-		viestit = new LinkedList<>();
-		initialize();
-		initializeController();
-		
-	}
-	private void initializeController() throws IOException {
-		this.chatClient = new chatClient("localhost", 12345,this);
-	}
+	//Initialisaattorit
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
 		JButton lahetaViesti = initializeButtonsAndGUILayout();
 		addActionListenerToButton(lahetaViesti);
-		frmChatClient.getContentPane().add(lahetaViesti, "cell 1 2,grow");
+		frmChatFrame.getContentPane().add(lahetaViesti, "cell 1 2,grow");
 	}
-	private void addActionListenerToButton(JButton lahetaViesti) {
-		lahetaViesti.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					chatClient.lahetaViesti(kirjoitaViesti.getText());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
+	/**
+	 * Create the application.
+	 * @throws IOException 
+	 */
+	private void initializeController() throws IOException {
+		this.chatClient = new chatClient("localhost", 12345,this);
 	}
 	private JButton initializeButtonsAndGUILayout() {
-		frmChatClient = new JFrame();
-		frmChatClient.setTitle("Chat client");
-		frmChatClient.setBounds(100, 100, 898, 598);
-		frmChatClient.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmChatClient.getContentPane().setLayout(new MigLayout("", "[:88.09%:73.23%,grow][grow]", "[][323px,grow][62px]"));
-		JToolBar toolBar = new JToolBar();
-		frmChatClient.getContentPane().add(toolBar, "cell 0 0");
-		JScrollPane scrollPane = new JScrollPane();
-		frmChatClient.getContentPane().add(scrollPane, "cell 0 1,grow");
-		kaikkienViestit = new JTextArea();
-		kaikkienViestit.setColumns(15);
-		scrollPane.setViewportView(kaikkienViestit);
-		JScrollPane scrollPane_1 = new JScrollPane();
-		frmChatClient.getContentPane().add(scrollPane_1, "cell 1 1,grow");
-		JTextArea kayttajat = new JTextArea();
-		scrollPane_1.setViewportView(kayttajat);
-		JScrollPane scrollPane_2 = new JScrollPane();
-		frmChatClient.getContentPane().add(scrollPane_2, "cell 0 2,grow");
-		kirjoitaViesti = new JTextField();
-		scrollPane_2.setViewportView(kirjoitaViesti);
-		kirjoitaViesti.setColumns(10);
+		initializeComponentsWithNew();
+		initializeChatFrameRelatedStuff();
+		textPaneStuff();
+		scrollPaneStuff();
 		addEnterListenerToChatBox();
-		JButton lahetaViesti = new JButton("Send message");
-		JButton btnParempiaIhmisi = new JButton("Anna parempia ihmisi‰!");
-		btnParempiaIhmisi.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						try {
-							MatcherGUI window = new MatcherGUI();
-							window.frame.setVisible(true);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
-			}
-		});
-		toolBar.add(btnParempiaIhmisi);
+		addActionListenerToButton();
+		toolbarRelatedConfigStuff();
 		return lahetaViesti;
+	}
+	private void initializeComponentsWithNew() {
+		btnParempiaIhmisi = new JButton("Anna parempia ihmisi‰!");
+		frmChatFrame = new JFrame();
+		frmChatFrame.getContentPane().setLayout(new MigLayout("", "[:88.09%:73.23%,grow][grow]", "[][323px,grow][62px]"));
+		kaikkienViestit = new JTextArea();
+		kayttajat = new JTextArea();
+		kirjoitaViesti = new JTextField();
+		lahetaViesti = new JButton("Send message");
+		scrollPane = new JScrollPane();
+		scrollPane_1 = new JScrollPane();
+		scrollPane_2 = new JScrollPane();
+		toolBar = new JToolBar();
+	}
+	private void initializeChatFrameRelatedStuff() {
+		frmChatFrame.setTitle("Chat client");
+		frmChatFrame.setBounds(100, 100, 898, 598);
+		frmChatFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmChatFrame.getContentPane().add(toolBar, "cell 0 0");
+		frmChatFrame.getContentPane().add(scrollPane, "cell 0 1,grow");
+		frmChatFrame.getContentPane().add(scrollPane_1, "cell 1 1,grow");
+		frmChatFrame.getContentPane().add(scrollPane_2, "cell 0 2,grow");
+	}
+	private void toolbarRelatedConfigStuff() {
+		toolBar.add(btnParempiaIhmisi);
+	}
+	private void textPaneStuff() {
+		kirjoitaViesti.setColumns(10);
+		kaikkienViestit.setColumns(15);
+	}
+	private void scrollPaneStuff() {
+		scrollPane.setViewportView(kaikkienViestit);
+		scrollPane_1.setViewportView(kayttajat);
+		scrollPane_2.setViewportView(kirjoitaViesti);
 	}
 
 	private void addEnterListenerToChatBox() {
@@ -134,7 +130,6 @@ public class clientGUI {
 	private void tulostaKayttajat() {
 		//Kutsu t‰h‰n metodiin tulee serverilt‰ itselt‰‰n chatClient controllerin kautta
 		//TODO
-		
 	}
 	/**
 	 * Kirjoitetaan kaikille n‰kyv‰‰n laatikkoon viesti.
@@ -146,21 +141,21 @@ public class clientGUI {
 			viestit.add(viesti);
 			kaikkienViestit.setText("");
 			for (String string : viestit) {
-				kaikkienViestit.append(string);
-				kaikkienViestit.append("\n");
-				kirjoitaViesti.setText("");
+				kirjoitaKaikkienViesteihinOikein(string);
 			}
 		} else {
 			viestit.add(viesti);
 			kaikkienViestit.setText("");
 			for (String string : viestit) {
-				kaikkienViestit.append(string);
-				kaikkienViestit.append("\n");
-				kirjoitaViesti.setText("");
+				kirjoitaKaikkienViesteihinOikein(string);
 			}
 		}
 	}
-
+	private void kirjoitaKaikkienViesteihinOikein(String string) {
+		kaikkienViestit.append(string);
+		kaikkienViestit.append("\n");
+		kirjoitaViesti.setText("");
+	}
 	private boolean onkoViestejaYliRowCountin() {
 		//TODO kehit‰ t‰h‰n joku p‰tev‰ dynaaminen tarkistus
 		int height = kaikkienViestit.getHeight();
@@ -169,5 +164,35 @@ public class clientGUI {
 			return true;
 		}
 		return false;
+	}
+
+	//Action-listenerit ja niiden lis‰ykset
+	private void addActionListenerToButton() {
+		btnParempiaIhmisi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							MatcherGUI window = new MatcherGUI();
+							window.frame.setVisible(true);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		});
+	}
+	private void addActionListenerToButton(JButton lahetaViesti) {
+		lahetaViesti.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					chatClient.lahetaViesti(kirjoitaViesti.getText());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 }

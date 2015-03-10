@@ -11,10 +11,10 @@ import valiaho.distributedChat.*;
 import valiaho.security.*;
 
 public class DBUploaderThread extends TimerTask {
-	private LocalEncryptionFactory encryptionFactory;
 	private ArrayList<Viesti> kaikkiViestit;
-	private Socket sqlSocketServer;
+	private LocalEncryptionFactory encryptionFactory;
 	private ObjectOutputStream out;
+	private Socket sqlSocketServer;
 
 	public DBUploaderThread(ArrayList<Viesti> kaikkiViestit) {
 		this.kaikkiViestit = kaikkiViestit;

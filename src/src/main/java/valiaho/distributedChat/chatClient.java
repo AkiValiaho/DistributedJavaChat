@@ -12,15 +12,15 @@ import valiaho.security.*;
  *
  */
 public class chatClient {
-	private ObjectOutputStream output;
-	private ObjectInputStream input;
-	private UUID userID;
-	private int portNumber;
-	private String hostName;
-	private Socket clientSideSocket;
 	private chatClientReaderThread readerThread;
 	private clientGUI GUI;
+	private int portNumber;
 	private LocalEncryptionFactory encryptionFactory = new LocalEncryptionFactory();
+	private ObjectInputStream input;
+	private ObjectOutputStream output;
+	private Socket clientSideSocket;
+	private String hostName;
+	private UUID userID;
 
 	/**
 	 * Clienttiohjelman konstruktori, joka
@@ -33,16 +33,6 @@ public class chatClient {
 		assignVariables(passedHostName, passedPortNumber, GUI);
 		startReaderThread();
 		setEncryptionFactorySettings();
-		
-	}
-	private void setEncryptionFactorySettings() throws IOException {
-		encryptionFactory.setAlgorithmString("DES");
-		encryptionFactory.setLocationToKeyString(new File("theKey.txt"));
-		
-	}
-	private void startReaderThread() throws IOException {
-		readerThread = new chatClientReaderThread(input,userID,this);
-		readerThread.start();
 	}
 	private void assignVariables(String passedHostName, int passedPortNumber,
 			clientGUI GUI) throws UnknownHostException, IOException {
@@ -58,6 +48,10 @@ public class chatClient {
 		viestiOlio.setInformationObjectBoolean(true);
 		viestiOlio.setUserID(userID);
 		output.writeObject(LocalEncryptionFactory.writeSealedObjectToSocket(viestiOlio, encryptionFactory));
+	}
+	private void startReaderThread() throws IOException {
+		readerThread = new chatClientReaderThread(input,userID,this);
+		readerThread.start();
 	}
 	public void lahetaViesti(String text) throws IOException {
 		// TODO Auto-generated method stub
@@ -98,5 +92,11 @@ public class chatClient {
 	}
 	public void kirjoitaGUIhin(String viesti) {
 		GUI.kirjoitaKaikkienViesteihin(viesti);
+	}
+
+	private void setEncryptionFactorySettings() throws IOException {
+		encryptionFactory.setAlgorithmString("DES");
+		encryptionFactory.setLocationToKeyString(new File("theKey.txt"));
+		
 	}
 }
